@@ -1,0 +1,2 @@
+# db-exercises
+Databases exercises
