@@ -40,7 +40,7 @@ WHERE
 			) - 60
 ```
 
-```sql
+```plsql
 DECLARE
 
 	fecha_max DATE;
@@ -86,7 +86,7 @@ ORDER BY
 	num
 ```
 
-```sql
+```plsql
 DECLARE
 	
 	CURSOR c_pedidos IS
@@ -102,12 +102,22 @@ DECLARE
 
 BEGIN
 	
-	dbms_output.put_line('### Resultados ###');
+	dbms_output.put_line(rpad('#', 10, '#'));
+	dbms_output.put_line(rpad('-', 10, '-'));
+	dbms_output.put_line(
+		rpad('Num', 5) ||
+		rpad('Total', 5)
+	);
+	dbms_output.put_line(rpad('-', 10, '-'));
 	FOR r_pedido IN c_pedidos
 	LOOP
-		dbms_output.put_line(r_pedido.num  || ' < = > ' || r_pedido.total);
+		dbms_output.put_line(
+		rpad(r_pedido.num,5) ||
+		rpad(r_pedido.total, 5)
+	);
+	dbms_output.put_line(rpad('-', 10, '-'));
 	END LOOP;
-	dbms_output.put_line('### Fin ###');
+	dbms_output.put_line(rpad('#', 10, '#'));
 
 END;
 ```
@@ -125,7 +135,7 @@ ORDER BY
 	nombre
 ```
 
-```sql
+```plsql
 DECLARE
 	
 	CURSOR c_productos IS
@@ -161,6 +171,42 @@ WHERE
 	apellidos LIKE '% Perez'
 ORDER BY 
 	codigo 
+```
+
+```PLSQL
+DECLARE
+	
+	CURSOR c_clientes IS 
+		SELECT 
+			* 
+		FROM 
+			clientes
+		WHERE 
+			apellidos LIKE '% Perez'
+		ORDER BY 
+			codigo ;
+
+BEGIN
+	
+	dbms_output.put_line(rpad('-',35,'-'));
+	dbms_output.put_line(
+			rpad('Cod',5) ||
+			rpad('Nombre',10) || 
+			rpad('Apellidos',15) ||
+			rpad('Edad',5) 
+		);
+	dbms_output.put_line(rpad('-',35,'-'));
+	FOR r_clientes IN c_clientes
+	LOOP
+		dbms_output.put_line(
+			rpad(r_clientes.codigo,5) ||
+			rpad(r_clientes.nombre,10) || 
+			rpad(r_clientes.apellidos,15) ||
+			rpad(r_clientes.edad,5) 
+		);
+	dbms_output.put_line(rpad('-',35,'-'));
+	END LOOP;
+END;
 ```
 
  5 Número total de productos que vende la empresa (en la columna debe aparecer “Nº de productos”)
