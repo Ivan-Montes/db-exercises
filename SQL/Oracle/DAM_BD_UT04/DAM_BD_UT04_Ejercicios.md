@@ -27,25 +27,54 @@ El campo IMPORTE ya tiene calculado la cantidad del producto x precio del produc
 1.Número e importe total de todos los pedidos realizados en los últimos 60 días.
 
 ```sql
+SELECT COUNT(p.NUM) "Nº Pedidos", SUM(p.TOTAL) "Total"
+FROM PEDIDOS p
+WHERE p.FECHA > ( SELECT MAX(FECHA) FROM PEDIDOS ) - 60;
+```
 
+```
+DECLARE
+
+	fechaMax DATE;
+	numPedidos Pedidos.NUM%TYPE;
+	sumTotal Pedidos.TOTAL%TYPE;
+
+BEGIN
+	
+	--Queries
+	SELECT MAX(FECHA)INTO fechaMax  FROM PEDIDOS;
+
+	SELECT COUNT(p.NUM) "Nº Pedidos", SUM(p.TOTAL) "Total"
+	INTO numPedidos, sumTotal
+	FROM PEDIDOS p
+	WHERE p.FECHA > fechaMax - 60;
+
+	--Show
+	DBMS_OUTPUT.PUT_LINE('Nº Pedidos: ' || ' ' || numPedidos);
+	DBMS_OUTPUT.PUT_LINE('Total: ' || ' ' || sumTotal);
+
+END;
 ```
 
 2.Número e importe de los pedidos cuyo importe esté entre 100 y 200 €
 
 ```
-
+SELECT p.NUM "Nº Pedido", p.TOTAL "Importe"
+FROM PEDIDOS p
+WHERE p.TOTAL BETWEEN 100 AND 200
+ORDER BY p.NUM;
 ```
 
 3.Código y nombre de los productos ordenados ascendentemente por precio y nombre
 
-```
-
+```sql
+SELECT codigo, nombre FROM productos ORDER BY precio, nombre; 
 ```
 
 4.Clientes cuyo segundo apellido sea Perez
 
 ```
-
+SELECT * FROM clientes WHERE APELLIDOS LIKE '% Perez';
 ```
 
 5.Número total de productos que vende la empresa (en la columna debe aparecer “Nº de productos”)
@@ -165,7 +194,7 @@ que se han pedido (los que no hayan sido pedidos también deben ser mostrados co
 
 ```
  
-24.Sentencia que muestre los productos con este formato
+24.Sentencia que muestre los productos con este formato 
 ![24](./images/24.PNG "Formato 24")
 
 ```
