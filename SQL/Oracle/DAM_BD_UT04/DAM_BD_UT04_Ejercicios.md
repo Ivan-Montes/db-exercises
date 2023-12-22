@@ -10,7 +10,7 @@ La empresa El Desván, que se dedica a la rama textil ha decidido informatizar s
 Con todos estos datos se ha llegado al siguiente modelo entidad-relación (a falta de completar con 
 el resto de atributos de las entidades):
 
-![DAM_BD_UT04_MER](./DAM_BD_UT04_MER.JPG "Database MER")
+![DAM_BD_UT04_MER](./images/DAM_BD_UT04_MER.JPG "Database MER")
 
 
 ### ACLARACIONES
@@ -166,12 +166,14 @@ que se han pedido (los que no hayan sido pedidos también deben ser mostrados co
 ```
  
 24.Sentencia que muestre los productos con este formato
+![24](./images/24.PNG "Formato 24")
 
 ```
 
 ```
 
 25.Escribe los datos de los pedidos y su clientes con el siguiente formato:
+![25](./images/24.PNG "Formato 25")
 
 ```
 
