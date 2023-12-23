@@ -86,7 +86,7 @@ ORDER BY
 	num
 ```
 
-```plsql
+```sqlpl
 DECLARE
 	
 	CURSOR c_pedidos IS
@@ -135,7 +135,7 @@ ORDER BY
 	nombre
 ```
 
-```plsql
+```SQLPL
 DECLARE
 	
 	CURSOR c_productos IS
@@ -212,25 +212,126 @@ END;
  5 Número total de productos que vende la empresa (en la columna debe aparecer “Nº de productos”)
 
 ```sql
-
+SELECT 
+	count(*) AS "Nº de productos"
+FROM
+	productos
 ```
 
  6 Número total de productos que no han sido pedidos
 
 ```sql
+SELECT 
+	count(p.codigo) AS "Nº de productos no pedidos"
+FROM
+	productos p
+LEFT JOIN lineas l
+	ON l.producto = p.codigo
+WHERE 
+	l.producto IS NULL 
+ORDER BY
+	p.codigo
+```
 
+```sql
+SELECT 
+	count(codigo) AS "Nº de productos no pedidos"
+FROM 
+	productos
+WHERE 
+	codigo NOT IN(SELECT producto FROM lineas)
 ```
 
  7 De cada pedido, mostrar su número, importe total y datos del cliente
 
 ```sql
+SELECT 
+	p.num AS "Nº de pedido",
+	p.total AS "Importe",
+	c.codigo AS "Codigo de cliente",
+	c.nombre AS "Nombre",
+	c.apellidos AS "Apellidos",
+	c.edad AS "Edad"
+FROM
+	pedidos p 
+INNER JOIN clientes c
+	ON p.cliente = c.codigo	
+ORDER BY
+	p.num
+```
 
+```PLSQL
+DECLARE
+	
+	CURSOR c_pedidos_clientes IS
+		SELECT 
+			p.num,
+			p.total,
+			c.codigo,
+			c.nombre,
+			c.apellidos,
+			c.edad
+		FROM
+			pedidos p 
+		INNER JOIN clientes c
+			ON p.cliente = c.codigo	
+		ORDER BY
+			p.num;
+
+BEGIN
+	dbms_output.put_line(rpad('-',65,'-'));
+	dbms_output.put_line(
+			rpad('Nº', 5) ||
+			rpad('Importe', 10) || 
+			rpad('Cliente', 10) ||
+			rpad('Nombre', 15) ||
+			rpad('Apellidos', 20) ||
+			lpad('Edad', 5) 
+		);
+	dbms_output.put_line(rpad('-',65,'-'));
+	FOR r_pedidos_clientes IN c_pedidos_clientes
+	LOOP
+		dbms_output.put_line(
+			rpad(r_pedidos_clientes.num,5) ||
+			rpad(r_pedidos_clientes.total,10) || 
+			rpad(r_pedidos_clientes.codigo,10) ||
+			rpad(r_pedidos_clientes.nombre,15) ||
+			rpad(r_pedidos_clientes.apellidos,20) ||
+			lpad(r_pedidos_clientes.edad,5) 
+		);
+		dbms_output.put_line(rpad('-',65,'-'));
+	END LOOP;
+END;
 ```
 
  8 Código, nombre del cliente y número total de pedidos que ha hecho cada cliente, ordenado de más a menos pedidos
 
 ```sql
+SELECT 
+	p.CLIENTE,
+	(SELECT c.nombre || ' ' || c.apellidos FROM clientes c WHERE c.codigo = p.cliente) AS "Datos Cliente",
+	count(p.num) AS "Pedidos"
+FROM
+	pedidos p
+GROUP BY
+	p.cliente
+ORDER BY
+	count(p.num) DESC
+```
 
+```sql
+SELECT 
+	p.CLIENTE,	
+	c.nombre,
+	count(p.num) AS "Pedidos"
+FROM
+	pedidos p
+INNER JOIN clientes c
+	ON p.cliente = c.codigo
+GROUP BY
+	p.cliente, c.nombre
+ORDER BY
+	count(p.num) DESC
 ```
 
  9 Código, nombre del cliente y número total de pedidos que ha realizado cada cliente durante 2016
