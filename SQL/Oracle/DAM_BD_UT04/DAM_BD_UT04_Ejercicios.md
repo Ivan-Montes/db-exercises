@@ -40,12 +40,13 @@ WHERE
 			) - 60
 ```
 
-```plsql
+```
 DECLARE
 
 	fecha_max DATE;
 	num_pedidos Pedidos.NUM%TYPE;
 	sum_total Pedidos.TOTAL%TYPE;
+	l_msg VARCHAR2(255);
 
 BEGIN
 	
@@ -69,7 +70,11 @@ BEGIN
 
 	DBMS_OUTPUT.PUT_LINE('Nº Pedidos: ' || ' ' || num_pedidos);
 	DBMS_OUTPUT.PUT_LINE('Total: ' || ' ' || sum_total);
-
+	
+	EXCEPTION 
+        WHEN OTHERS THEN
+        l_msg := SQLERRM;  
+        dbms_output.put_line('Excepción desconocida con mensaje => ' || l_msg);
 END;
 ```
 
@@ -86,7 +91,7 @@ ORDER BY
 	num
 ```
 
-```sqlpl
+```
 DECLARE
 	
 	CURSOR c_pedidos IS
@@ -135,7 +140,7 @@ ORDER BY
 	nombre
 ```
 
-```SQLPL
+```
 DECLARE
 	
 	CURSOR c_productos IS
@@ -173,7 +178,7 @@ ORDER BY
 	codigo 
 ```
 
-```PLSQL
+```
 DECLARE
 	
 	CURSOR c_clientes IS 
@@ -260,7 +265,7 @@ ORDER BY
 	p.num
 ```
 
-```PLSQL
+```
 DECLARE
 	
 	CURSOR c_pedidos_clientes IS
@@ -337,13 +342,142 @@ ORDER BY
  9 Código, nombre del cliente y número total de pedidos que ha realizado cada cliente durante 2016
 
 ```sql
-
+SELECT 
+	p.CLIENTE,
+	(SELECT c.nombre || ' ' || c.apellidos FROM clientes c WHERE c.codigo = p.cliente) AS "Datos Cliente",
+	count(p.num) AS "Pedidos"
+FROM
+	pedidos p
+WHERE 
+	EXTRACT(YEAR FROM p.FECHA) = '2016'
+GROUP BY
+	p.cliente
+ORDER BY
+	count(p.num) DESC
 ```
 
+```
+DECLARE
+	
+	TYPE t_pedidos_clientes IS RECORD (
+		cod_cliente pedidos.cliente%TYPE,
+		nombre_cliente varchar2(64),
+		cantidad_pedidos varchar2(64)
+	);	
+
+	CURSOR c_pedidos_clientes IS
+		SELECT 
+			p.cliente,
+			(SELECT c.nombre || ' ' || c.apellidos FROM clientes c WHERE c.codigo = p.cliente),
+			count(p.num)
+		FROM
+			pedidos p
+		WHERE 
+			EXTRACT(YEAR FROM p.FECHA) = '2016'
+		GROUP BY
+			p.cliente
+		ORDER BY
+			count(p.num) DESC;
+		
+	r_pedidos_clientes t_pedidos_clientes;
+
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',40,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 5) ||
+			rpad('Nombre y Apellidos', 25) ||
+			lpad('Nº Pedidos', 10) 
+		);
+	dbms_output.put_line(rpad('-',40,'-'));
+	OPEN c_pedidos_clientes;
+	LOOP
+		FETCH c_pedidos_clientes INTO r_pedidos_clientes;
+		EXIT WHEN c_pedidos_clientes%notfound;	
+			dbms_output.put_line(
+				rpad(r_pedidos_clientes.cod_cliente, 5) ||
+				rpad(r_pedidos_clientes.nombre_cliente, 25) ||
+				lpad(r_pedidos_clientes.cantidad_pedidos, 10)
+			);	
+			dbms_output.put_line(rpad('-',40,'-'));
+	END LOOP;
+	CLOSE c_pedidos_clientes;
+	dbms_output.put_line(rpad('#',5,'#'));
+	
+END;
+````
  10 Código, nombre y número total de pedidos de los clientes que han realizado más de un pedido
 
 ```sql
+SELECT 
+	c.codigo, 
+	c.nombre || ' ' || c.apellidos AS "Nombre Completo",
+	count(p.NUM) AS "Nº Pedidos"
+FROM
+	clientes c
+INNER JOIN
+	pedidos p
+	ON p.cliente = c.codigo
+GROUP BY 
+	C.codigo,
+	c.nombre,
+	c.apellidos
+HAVING
+	count(p.num) > 1
+```
 
+```
+DECLARE
+
+	TYPE t_clientes_pedidos IS record(
+		l_cod clientes.codigo%TYPE,
+		l_nombre varchar2(64),
+		l_num_pedidos number
+	);
+
+	r_clientes_pedidos t_clientes_pedidos;
+	
+	CURSOR c_clientes_pedidos IS
+		SELECT 
+			c.codigo, 
+			c.nombre || ' ' || c.apellidos,
+			count(p.NUM)
+		FROM
+			clientes c
+		INNER JOIN
+			pedidos p
+			ON p.cliente = c.codigo
+		GROUP BY 
+			C.codigo,
+			c.nombre,
+			c.apellidos
+		HAVING
+			count(p.num) > 1
+		;
+	
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',40,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 5) ||
+			rpad('Nombre y Apellidos', 25) ||
+			lpad('Nº Pedidos', 10) 
+		);
+	dbms_output.put_line(rpad('-',40,'-'));
+	OPEN c_clientes_pedidos;
+	LOOP
+		FETCH c_clientes_pedidos INTO r_clientes_pedidos;
+		EXIT WHEN c_clientes_pedidos%notfound;
+			dbms_output.put_line(
+				rpad(r_clientes_pedidos.l_cod,5) ||
+				rpad(r_clientes_pedidos.l_nombre, 25) ||
+				lpad(r_clientes_pedidos.l_num_pedidos, 10) 
+			);		
+			dbms_output.put_line(rpad('-',40,'-'));
+	END LOOP;
+	CLOSE c_clientes_pedidos;
+	dbms_output.put_line(rpad('#',5,'#'));
+END;
 ```
 
  11 Para cada pedido mostrar su número, código del cliente y nº total de líneas que tiene
