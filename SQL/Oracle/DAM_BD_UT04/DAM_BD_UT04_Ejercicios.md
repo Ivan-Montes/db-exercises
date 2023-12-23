@@ -43,9 +43,9 @@ WHERE
 ```
 DECLARE
 
-	fecha_max DATE;
-	num_pedidos Pedidos.NUM%TYPE;
-	sum_total Pedidos.TOTAL%TYPE;
+	l_fecha_max DATE;
+	l_num_pedidos Pedidos.NUM%TYPE;
+	l_sum_total Pedidos.TOTAL%TYPE;
 	l_msg VARCHAR2(255);
 
 BEGIN
@@ -53,7 +53,7 @@ BEGIN
 	SELECT 
 		MAX(FECHA)
 	INTO 
-		fecha_max  
+		l_fecha_max  
 	FROM 
 		pedidos;
 
@@ -61,15 +61,17 @@ BEGIN
 		count(num) "Nº Pedidos",
 		sum(total) "Total"
 	INTO 
-		num_pedidos, 
-		sum_total
+		l_num_pedidos, 
+		l_sum_total
 	FROM
 		pedidos
 	WHERE
-		fecha > fecha_max - 60;
-
-	DBMS_OUTPUT.PUT_LINE('Nº Pedidos: ' || ' ' || num_pedidos);
-	DBMS_OUTPUT.PUT_LINE('Total: ' || ' ' || sum_total);
+		fecha > l_fecha_max - 60;
+	
+	dbms_output.put_line(rpad('-',15,'-'));
+	dbms_output.put_line('Nº Pedidos: ' || ' ' || l_num_pedidos);
+	dbms_output.put_line('Total: ' || ' ' || l_sum_total);
+	dbms_output.put_line(rpad('-',15,'-'));
 	
 	EXCEPTION 
         WHEN OTHERS THEN
@@ -225,6 +227,16 @@ FROM
 
  6 Número total de productos que no han sido pedidos
 
+
+```sql
+SELECT 
+	count(codigo) AS "Nº de productos no pedidos"
+FROM 
+	productos
+WHERE 
+	codigo NOT IN(SELECT producto FROM lineas)
+```
+
 ```sql
 SELECT 
 	count(p.codigo) AS "Nº de productos no pedidos"
@@ -236,15 +248,6 @@ WHERE
 	l.producto IS NULL 
 ORDER BY
 	p.codigo
-```
-
-```sql
-SELECT 
-	count(codigo) AS "Nº de productos no pedidos"
-FROM 
-	productos
-WHERE 
-	codigo NOT IN(SELECT producto FROM lineas)
 ```
 
  7 De cada pedido, mostrar su número, importe total y datos del cliente
@@ -311,6 +314,8 @@ END;
 
  8 Código, nombre del cliente y número total de pedidos que ha hecho cada cliente, ordenado de más a menos pedidos
 
+La Consulta 1 incluiría esos clientes con un conteo de pedidos de 0, mientras que la Consulta 2 los excluiría debido a la combinación interna.
+
 ```sql
 SELECT 
 	p.CLIENTE,
@@ -360,9 +365,9 @@ ORDER BY
 DECLARE
 	
 	TYPE t_pedidos_clientes IS RECORD (
-		cod_cliente pedidos.cliente%TYPE,
-		nombre_cliente varchar2(64),
-		cantidad_pedidos varchar2(64)
+		l_cod_cliente pedidos.cliente%TYPE,
+		l_nombre_cliente varchar2(64),
+		l_cantidad_pedidos varchar2(64)
 	);	
 
 	CURSOR c_pedidos_clientes IS
@@ -395,9 +400,9 @@ BEGIN
 		FETCH c_pedidos_clientes INTO r_pedidos_clientes;
 		EXIT WHEN c_pedidos_clientes%notfound;	
 			dbms_output.put_line(
-				rpad(r_pedidos_clientes.cod_cliente, 5) ||
-				rpad(r_pedidos_clientes.nombre_cliente, 25) ||
-				lpad(r_pedidos_clientes.cantidad_pedidos, 10)
+				rpad(r_pedidos_clientes.l_cod_cliente, 5) ||
+				rpad(r_pedidos_clientes.l_nombre_cliente, 25) ||
+				lpad(r_pedidos_clientes.l_cantidad_pedidos, 10)
 			);	
 			dbms_output.put_line(rpad('-',40,'-'));
 	END LOOP;
@@ -406,6 +411,7 @@ BEGIN
 	
 END;
 ````
+
  10 Código, nombre y número total de pedidos de los clientes que han realizado más de un pedido
 
 ```sql
@@ -419,7 +425,7 @@ INNER JOIN
 	pedidos p
 	ON p.cliente = c.codigo
 GROUP BY 
-	C.codigo,
+	c.codigo,
 	c.nombre,
 	c.apellidos
 HAVING
@@ -482,14 +488,59 @@ END;
 
  11 Para cada pedido mostrar su número, código del cliente y nº total de líneas que tiene
 
-```sql
+Ambas consultas están diseñadas para producir los mismos resultados, pueden haber diferencias si hay pedidos sin líneas. La Consulta 1 incluiría esos pedidos con un conteo de líneas de 0, mientras que la Consulta 2 los excluiría debido a la combinación interna
 
+```sql
+SELECT 
+	p.num,
+	p.cliente,
+	(	SELECT count(num_pedido)
+		FROM lineas l
+		WHERE l.num_pedido = p.num
+		) AS "Nº Lineas"
+FROM
+	pedidos p
+ORDER BY
+	p.num
+```
+
+```sql
+SELECT 
+	p.num,
+	p.cliente,
+	count(l.num_pedido) AS "Nº Lineas"
+FROM
+	pedidos p
+INNER JOIN
+	lineas l
+	ON l.num_pedido = p.num
+GROUP BY 
+	p.num, p.CLIENTE
+ORDER BY
+	p.num
 ```
 
  12 Código de cliente, nombre de producto y cantidad total que ha pedido cada cliente de cada producto
 
 ```sql
-
+SELECT 
+	p.cliente,
+	pr.nombre,
+	sum(l.cantidad) AS "Cantidad"
+FROM
+	pedidos p
+INNER JOIN 
+	lineas l
+	ON l.num_pedido = p.num
+INNER JOIN 
+	productos pr
+	ON pr.codigo = l.producto
+GROUP BY 
+	p.cliente,
+	pr.nombre
+ORDER BY 
+	p.cliente,
+	sum(l.cantidad) DESC 
 ```
 
  13 Para cada cliente mostrar su código, nombre , numero e importe total de cada uno de sus pedidos
