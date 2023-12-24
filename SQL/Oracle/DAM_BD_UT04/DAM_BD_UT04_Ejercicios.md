@@ -758,7 +758,78 @@ que se han pedido (los que no hayan sido pedidos también deben ser mostrados co
 0) (combinación externa)
 
 ```sql
+SELECT 
+	p.codigo,
+	count(l.producto) AS "Nº Veces",
+	CASE WHEN sum(l.cantidad) IS NULL
+		THEN 0
+		ELSE sum(l.cantidad)
+	END 
+	AS "Cantidad"
+FROM
+	productos p
+LEFT JOIN
+	lineas l
+	ON l.producto = p.codigo
+GROUP BY 
+	p.codigo
+ORDER BY 
+	count(l.producto) DESC
+```
 
+```
+DECLARE
+
+	TYPE t_productos_lineas IS RECORD(
+		l_cod productos.codigo%TYPE,
+		l_veces number,
+		l_cantidad number
+	);
+
+	r_productos_lineas t_productos_lineas;
+	
+	CURSOR c_productos_lineas IS
+		SELECT 
+			p.codigo,
+			count(l.producto) AS "Nº Veces",
+			CASE WHEN sum(l.cantidad) IS NULL
+				THEN 0
+				ELSE sum(l.cantidad)
+			END 
+			AS "Cantidad"
+		FROM
+			productos p
+		LEFT JOIN
+			lineas l
+			ON l.producto = p.codigo
+		GROUP BY 
+			p.codigo
+		ORDER BY 
+			count(l.producto) DESC ;
+	
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',25,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 5) ||
+			lpad('Veces', 10) ||
+			lpad('Cantidad', 10) 
+		);
+	dbms_output.put_line(rpad('-',25,'-'));
+	OPEN c_productos_lineas;
+	LOOP
+		FETCH c_productos_lineas INTO r_productos_lineas;
+		EXIT WHEN c_productos_lineas%notfound;
+		dbms_output.put_line(
+				rpad(r_productos_lineas.l_cod, 5) ||
+				lpad(r_productos_lineas.l_veces, 10) ||
+				lpad(r_productos_lineas.l_cantidad, 10) 
+			);		
+			dbms_output.put_line(rpad('-',25,'-'));		
+	END LOOP;	
+	CLOSE c_productos_lineas;
+	dbms_output.put_line(rpad('#',5,'#'));
+END;
 ```
 
  16 Datos del producto del que más unidades se han pedido
