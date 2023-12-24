@@ -674,7 +674,83 @@ END;
 bajo de los pedidos que ha realizado
 
 ```sql
+SELECT 
+	c.codigo,
+	c.nombre || ' ' || c.apellidos AS "Nombre completo",
+	max(p.total) AS "Máximo",
+	min(p.total) AS "Mínimo"
+FROM
+	clientes c
+INNER JOIN 
+	pedidos p
+	ON c.codigo  = p.cliente
+WHERE 
+	c.edad < 18
+GROUP BY 
+	c.codigo,
+	c.nombre,
+	c.apellidos
+ORDER BY 
+	c.codigo
+```
 
+```
+DECLARE
+
+	TYPE t_clientes_pedidos IS RECORD(
+		l_cod clientes.codigo%TYPE,
+		l_nombre varchar2(64),
+		l_max number,
+		l_min number
+	);
+
+	r_clientes_pedidos t_clientes_pedidos;
+	
+	CURSOR c_clientes_pedidos IS
+		SELECT 
+			c.codigo,
+			c.nombre || ' ' || c.apellidos,
+			max(p.total),
+			min(p.total)
+		FROM
+			clientes c
+		INNER JOIN 
+			pedidos p
+			ON c.codigo  = p.cliente
+		WHERE 
+			c.edad < 18
+		GROUP BY 
+			c.codigo,
+			c.nombre,
+			c.apellidos
+		ORDER BY 
+			c.codigo;
+			
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',45,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 5) ||
+			rpad('Nombre y Apellidos', 30) ||
+			rpad('Max', 5) ||
+			lpad('Min', 5) 
+		);
+	dbms_output.put_line(rpad('-',45,'-'));
+	OPEN c_clientes_pedidos;
+	LOOP
+		FETCH c_clientes_pedidos INTO r_clientes_pedidos;
+		EXIT WHEN c_clientes_pedidos%notfound;
+		dbms_output.put_line(
+				rpad(r_clientes_pedidos.l_cod, 5) ||
+				rpad(r_clientes_pedidos.l_nombre, 30) ||
+				rpad(r_clientes_pedidos.l_max, 5) ||
+				lpad(r_clientes_pedidos.l_min, 5) 
+			);		
+			dbms_output.put_line(rpad('-',45,'-'));		
+	END LOOP;	
+	CLOSE c_clientes_pedidos;
+	dbms_output.put_line(rpad('#',5,'#'));
+END;
 ```
 
  15 Mostrar el código del producto, el nº de veces que ha sido pedido y la cantidad total de unidades 
