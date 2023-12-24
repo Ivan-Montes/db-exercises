@@ -543,6 +543,62 @@ ORDER BY
 	sum(l.cantidad) DESC 
 ```
 
+```
+DECLARE
+
+	TYPE t_clientes_pedidos IS record(
+		l_cod pedidos.cliente%TYPE,
+		l_nombre varchar2(64),
+		l_cantidad number
+	);
+	
+	r_clientes_pedidos t_clientes_pedidos;
+	
+	CURSOR c_clientes_pedidos IS
+		SELECT 
+			p.cliente,
+			pr.nombre,
+			sum(l.cantidad)
+		FROM
+			pedidos p
+		INNER JOIN 
+			lineas l
+			ON l.num_pedido = p.num
+		INNER JOIN 
+			productos pr
+			ON pr.codigo = l.producto
+		GROUP BY 
+			p.cliente,
+			pr.nombre
+		ORDER BY 
+			p.cliente,
+			sum(l.cantidad) DESC;
+			
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',35,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 5) ||
+			rpad('Nombre y Apellidos', 20) ||
+			lpad('Cantidad', 10) 
+		);
+	dbms_output.put_line(rpad('-',35,'-'));
+	OPEN c_clientes_pedidos;
+	LOOP
+		FETCH c_clientes_pedidos INTO r_clientes_pedidos;
+		EXIT WHEN c_clientes_pedidos%notfound;
+		dbms_output.put_line(
+				rpad(r_clientes_pedidos.l_cod, 5) ||
+				rpad(r_clientes_pedidos.l_nombre, 20) ||
+				lpad(r_clientes_pedidos.l_cantidad, 10) 
+			);		
+			dbms_output.put_line(rpad('-',35,'-'));		
+	END LOOP;	
+	CLOSE c_clientes_pedidos;
+	dbms_output.put_line(rpad('#',5,'#'));
+END;
+```
+
  13 Para cada cliente mostrar su código, nombre , numero e importe total de cada uno de sus pedidos
 
 ```sql
