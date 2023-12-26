@@ -1041,8 +1041,8 @@ ORDER BY
 
 	TYPE t_productos IS RECORD
 	(
-		codigo pedidos.cliente%TYPE,
-		cantidad number
+		l_codigo pedidos.cliente%TYPE,
+		l_cantidad number
 	);
 
 	CURSOR c_productos IS
@@ -1073,8 +1073,8 @@ BEGIN
 		FETCH c_productos INTO r_productos;
 		EXIT WHEN c_productos%notfound;
 				dbms_output.put_line(
-					rpad(r_productos.codigo, 10) ||
-					rpad(r_productos.cantidad, 10) 
+					rpad(r_productos.l_codigo, 10) ||
+					rpad(r_productos.l_cantidad, 10) 
 				);
 			dbms_output.put_line(rpad('-',20,'-'));
 	END LOOP;
@@ -1113,8 +1113,8 @@ DECLARE
 
 	TYPE t_productos IS RECORD
 	(
-		codigo pedidos.cliente%TYPE,
-		cantidad number
+		l_codigo pedidos.cliente%TYPE,
+		l_cantidad number
 	);
 
 	CURSOR c_productos IS
@@ -1154,8 +1154,8 @@ BEGIN
 		FETCH c_productos INTO r_productos;
 		EXIT WHEN c_productos%notfound;
 				dbms_output.put_line(
-					rpad(r_productos.codigo, 10) ||
-					rpad(r_productos.cantidad, 10) 
+					rpad(r_productos.l_codigo, 10) ||
+					rpad(r_productos.l_cantidad, 10) 
 				);
 			dbms_output.put_line(rpad('-',20,'-'));
 	END LOOP;
@@ -1193,8 +1193,8 @@ DECLARE
 
 	TYPE t_productos IS RECORD
 	(
-		codigo pedidos.cliente%TYPE,
-		cantidad number
+		l_codigo pedidos.cliente%TYPE,
+		l_cantidad number
 	);
 
 	CURSOR c_productos IS
@@ -1233,8 +1233,8 @@ BEGIN
 		FETCH c_productos INTO r_productos;
 		EXIT WHEN c_productos%notfound;
 				dbms_output.put_line(
-					rpad(r_productos.codigo, 10) ||
-					rpad(r_productos.cantidad, 10) 
+					rpad(r_productos.l_codigo, 10) ||
+					rpad(r_productos.l_cantidad, 10) 
 				);
 			dbms_output.put_line(rpad('-',20,'-'));
 	END LOOP;
@@ -1272,10 +1272,10 @@ DECLARE
 
 	TYPE t_pedidos IS RECORD
 	(
-		num pedidos.num%TYPE,
-		total pedidos.total%TYPE,
-		cliente pedidos.cliente%TYPE,
-		gastos_envio number
+		l_num pedidos.num%TYPE,
+		l_total pedidos.total%TYPE,
+		l_cliente pedidos.cliente%TYPE,
+		l_gastos_envio number
 	);
 
 	CURSOR c_pedidos IS
@@ -1316,10 +1316,10 @@ BEGIN
 		FETCH c_pedidos INTO r_pedidos;
 		EXIT WHEN c_pedidos%notfound;
 				dbms_output.put_line(
-					rpad(r_pedidos.num, 10) ||
-					rpad(r_pedidos.total, 10) ||
-					lpad(r_pedidos.cliente, 10) ||
-					lpad(r_pedidos.gastos_envio, 10) 
+					rpad(r_pedidos.l_num, 10) ||
+					rpad(r_pedidos.l_total, 10) ||
+					lpad(r_pedidos.l_cliente, 10) ||
+					lpad(r_pedidos.l_gastos_envio, 10) 
 				);
 			dbms_output.put_line(rpad('-',40,'-'));
 	END LOOP;
@@ -1420,18 +1420,141 @@ ORDER BY
  26 (Solo con subconsultas, sin combinar tablas) Datos de los clientes que han pedido el producto de nombre ‘PANTALON’
 
 ```sql
-
+SELECT
+	*
+FROM 
+	CLIENTES 
+WHERE 
+	codigo IN (
+				SELECT 
+					cliente
+				FROM
+					PEDIDOS 
+				WHERE 
+					num IN (
+							SELECT 
+								num_pedido
+							FROM
+								lineas
+							WHERE 
+								producto = (
+								SELECT 
+									codigo
+								FROM
+									productos 
+								WHERE 
+									nombre LIKE 'PANTALÓN'
+								)
+							));
 ```
  27 (Sin subconsultas) Datos de los clientes que han pedido el producto de nombre ‘PANTALON’
 
 ```sql
-
+SELECT
+	c.*
+FROM
+	clientes c
+INNER JOIN
+	pedidos P
+	ON p.cliente = c.codigo
+INNER JOIN 
+	lineas l
+	ON l.num_pedido = p.num
+INNER JOIN 
+	productos pp
+	ON pp.codigo = l.producto
+WHERE
+	pp.nombre LIKE 'PANTALÓN'
 ```
- 28 Para cada cliente, mostrar los datos del pedido cuyo importe sea superior al importe l medio de sus pedidos
+ 28 Para cada cliente, mostrar los datos del pedido cuyo importe sea superior al importe medio de sus pedidos
 
 ```sql
+SELECT 
+	p.num,
+	CASE 
+	WHEN p.gastos_envio IS NULL 
+		THEN 0
+		ELSE p.gastos_envio
+	END AS "Gº Envío",
+	p.total,
+	p.cliente
+FROM
+	pedidos p
+WHERE 
+	p.total > ALL(
+					SELECT 
+						AVG(p2.total)
+					FROM
+						pedidos p2
+					WHERE 
+						p.cliente = p2.cliente
+				)
+```
 
 ```
+DECLARE
+
+	TYPE t_pedidos IS RECORD
+	(
+		l_num pedidos.num%TYPE,
+		l_gastos_envio pedidos.gastos_envio%TYPE,
+		l_total pedidos.total%TYPE,
+		l_cliente pedidos.cliente%TYPE
+	);
+
+	l_gastos_envio_check pedidos.gastos_envio%TYPE;
+
+	CURSOR c_pedidos IS
+			SELECT 
+				p.num,
+				p.gastos_envio,
+				p.total,
+				p.cliente
+			FROM
+				pedidos p
+			WHERE 
+				p.total > ALL(
+					SELECT 
+						AVG(p2.total)
+					FROM
+						pedidos p2
+					WHERE 
+						p.cliente = p2.cliente
+				);							
+	
+	r_pedidos t_pedidos;
+
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',40,'-'));
+	dbms_output.put_line(
+			rpad('Num', 10) ||
+			rpad('Gº Envio', 10) ||
+			rpad('Total', 10)  ||
+			lpad('Cliente', 10)  
+		);
+	dbms_output.put_line(rpad('-',40,'-'));
+	OPEN c_pedidos;		
+	LOOP
+		FETCH c_pedidos INTO r_pedidos;
+		EXIT WHEN c_pedidos%notfound;
+				IF r_pedidos.l_gastos_envio IS null
+					THEN l_gastos_envio_check := 0;
+					ELSE l_gastos_envio_check := r_pedidos.l_gastos_envio;
+				END if;
+				dbms_output.put_line(
+					rpad(r_pedidos.l_num, 10) ||
+					rpad(l_gastos_envio_check, 10) ||		
+					rpad(r_pedidos.l_total, 10) ||
+					lpad(r_pedidos.l_cliente, 10) 
+				);
+			dbms_output.put_line(rpad('-',40,'-'));
+	END LOOP;
+	CLOSE c_pedidos;
+	dbms_output.put_line(rpad('#',5,'#'));	
+END;
+```
+
  29 Lista de todos los pedidos con mostrando también los días previstos de espera para el envío
 
 ```sql
