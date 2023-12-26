@@ -1167,19 +1167,220 @@ END;
  21 Para cada cliente mostrar su código y la suma total del importe de sus pedidos y gastos de envÍo
 
 ```sql
+SELECT 
+	p.cliente AS "Cod",
+	CASE
+		WHEN sum(p.total) IS NULL AND sum(p.gastos_envio) IS NULL
+			THEN 0
+		WHEN sum(p.gastos_envio) IS NULL
+			THEN sum(p.total)
+		ELSE 
+			sum(p.total) + sum(p.gastos_envio)
+	END AS "Sumatorio"
+	
+FROM
+	pedidos p
+	
+GROUP BY
+	p.cliente 
+	
+ORDER BY
+	"Sumatorio" DESC 
+```
 
+```
+DECLARE
+
+	TYPE t_productos IS RECORD
+	(
+		codigo pedidos.cliente%TYPE,
+		cantidad number
+	);
+
+	CURSOR c_productos IS
+		SELECT 
+			p.cliente AS "Cod",
+			CASE
+				WHEN sum(p.total) IS NULL AND sum(p.gastos_envio) IS NULL
+					THEN 0
+				WHEN sum(p.gastos_envio) IS NULL
+					THEN sum(p.total)
+				ELSE 
+					sum(p.total) + sum(p.gastos_envio)
+			END AS "Sumatorio"
+			
+		FROM
+			pedidos p
+			
+		GROUP BY
+			p.cliente 
+			
+		ORDER BY
+			"Sumatorio" DESC; 
+		
+	r_productos t_productos;
+
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',20,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 10) ||
+			rpad('Cantidad', 10) 
+		);
+	dbms_output.put_line(rpad('-',20,'-'));
+	OPEN c_productos;		
+	LOOP
+		FETCH c_productos INTO r_productos;
+		EXIT WHEN c_productos%notfound;
+				dbms_output.put_line(
+					rpad(r_productos.codigo, 10) ||
+					rpad(r_productos.cantidad, 10) 
+				);
+			dbms_output.put_line(rpad('-',20,'-'));
+	END LOOP;
+	CLOSE c_productos;
+	dbms_output.put_line(rpad('#',5,'#'));	
+END;
 ```
 
  22 Número de pedido , importe total y cliente de los pedidos que no tienen gastos de envío (debe aparecer un 0 en la columna de gastos de envío y pon una etiqueta a ese campo)
 
 ```sql
+SELECT 
+	p.num AS "Pedido",
+	p.total,
+	p.cliente AS "Cliente",
+	CASE
+		WHEN p.gastos_envio IS NULL
+			THEN 0
+		ELSE 
+			p.gastos_envio
+	END AS "Gº Envío"
+	
+FROM
+	pedidos p
 
+WHERE
+	p.gastos_envio IS NULL OR p.gastos_envio = 0
+	
+ORDER BY
+	"Pedido"
+```
+
+```
+DECLARE
+
+	TYPE t_pedidos IS RECORD
+	(
+		num pedidos.num%TYPE,
+		total pedidos.total%TYPE,
+		cliente pedidos.cliente%TYPE,
+		gastos_envio number
+	);
+
+	CURSOR c_pedidos IS
+		SELECT 
+			p.num AS "Pedido",
+			p.total,
+			p.cliente AS "Cliente",
+			CASE
+				WHEN p.gastos_envio IS NULL
+					THEN 0
+				ELSE 
+					p.gastos_envio
+			END AS "Gº Envío"
+			
+		FROM
+			pedidos p
+		
+		WHERE
+			p.gastos_envio IS NULL OR p.gastos_envio = 0
+			
+		ORDER BY
+			"Pedido"; 
+		
+	r_pedidos t_pedidos;
+
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',40,'-'));
+	dbms_output.put_line(
+			rpad('Num', 10) ||
+			rpad('Total', 10)  ||
+			lpad('Cliente', 10)  ||
+			lpad('Gº Envio', 10) 
+		);
+	dbms_output.put_line(rpad('-',40,'-'));
+	OPEN c_pedidos;		
+	LOOP
+		FETCH c_pedidos INTO r_pedidos;
+		EXIT WHEN c_pedidos%notfound;
+				dbms_output.put_line(
+					rpad(r_pedidos.num, 10) ||
+					rpad(r_pedidos.total, 10) ||
+					lpad(r_pedidos.cliente, 10) ||
+					lpad(r_pedidos.gastos_envio, 10) 
+				);
+			dbms_output.put_line(rpad('-',40,'-'));
+	END LOOP;
+	CLOSE c_pedidos;
+	dbms_output.put_line(rpad('#',5,'#'));	
+END;
 ```
 
  23 Datos del pedido más caro y del más barato
 
 ```sql
+SELECT 
+	p.*	
+FROM
+	pedidos p 
+WHERE 
+	p.total >= ALL 
+		(
+		SELECT	
+			max(pp.total) AS "Total"		
+		FROM
+			pedidos pp
+		)
+	OR
+	p.total <= ALL 
+		(
+		SELECT	
+			min(pp.total) AS "Total"		
+		FROM
+			pedidos pp
+		)
+```
 
+```sql
+SELECT 
+	p.*	
+FROM
+	pedidos p 
+WHERE 
+	p.total >= ALL 
+		(
+		SELECT	
+			max(pp.total) AS "Total"		
+		FROM
+			pedidos pp
+		)
+		
+	UNION
+	
+SELECT 
+	p.*	
+FROM
+	pedidos p 
+WHERE 
+	p.total <= ALL 
+		(
+		SELECT	
+			min(pp.total) AS "Total"		
+		FROM
+			pedidos pp
+		)
 ```
  
  24 Sentencia que muestre los productos con este formato 
