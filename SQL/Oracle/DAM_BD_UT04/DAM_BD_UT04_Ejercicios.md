@@ -835,7 +835,47 @@ END;
  16 Datos del producto del que más unidades se han pedido
 
 ```sql
+SELECT
+	p.codigo, 
+	p.nombre, 
+	p.precio
+FROM 
+	productos p
+INNER JOIN
+	lineas l
+	ON l.producto = p.codigo
+HAVING  
+ 	SUM(l.CANTIDAD) >= ALL (
+ 		SELECT 
+ 			SUM(l2.CANTIDAD)
+ 		FROM
+ 			lineas l2
+ 		GROUP BY
+ 			l2.producto
+ 	)
+GROUP BY
+	p.codigo, 
+	p.nombre, 
+	p.precio
+```
 
+```sql
+SELECT
+	p.codigo, 
+	p.nombre, 
+	p.precio
+FROM 
+	productos p
+INNER JOIN
+	lineas l
+	ON l.PRODUCTO = p.codigo
+GROUP BY
+	p.codigo, 
+	p.nombre, 
+	p.precio
+ORDER BY 
+	SUM(CANTIDAD) DESC
+FETCH FIRST ROW ONLY
 ```
 
  17 Datos del producto más caro del pedido 1
