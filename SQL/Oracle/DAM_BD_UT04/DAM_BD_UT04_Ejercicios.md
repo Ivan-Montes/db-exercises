@@ -1086,7 +1086,82 @@ END;
  20 Cantidad total gastada y código de cliente de los que menos han gastado en 2016
 
 ```sql
+SELECT 
+	p.cliente AS "Cod",
+	sum(p.total) AS "Total"
+FROM
+	pedidos p
+WHERE 
+	EXTRACT (YEAR FROM  p.FECHA) = 2016
+GROUP BY
+	p.cliente 
+HAVING
+	sum(p.total) <= ALL(
+						SELECT 
+							SUM(p2.total)	
+						FROM
+							pedidos p2
+						WHERE 
+							EXTRACT (YEAR FROM  p2.FECHA) = 2016
+						GROUP BY
+							p2.cliente 
+						)
+```
 
+```
+DECLARE
+
+	TYPE t_productos IS RECORD
+	(
+		codigo pedidos.cliente%TYPE,
+		cantidad number
+	);
+
+	CURSOR c_productos IS
+		SELECT 
+			p.cliente,
+			sum(p.total)
+		FROM
+			pedidos p
+		WHERE 
+			EXTRACT (YEAR FROM  p.FECHA) = 2016
+		GROUP BY
+			p.cliente 
+		HAVING
+			sum(p.total) <= ALL(
+						SELECT 
+							SUM(p2.total)	
+						FROM
+							pedidos p2
+						WHERE 
+							EXTRACT (YEAR FROM  p2.FECHA) = 2016
+						GROUP BY
+							p2.cliente 
+						);
+		
+	r_productos t_productos;
+
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',20,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 10) ||
+			rpad('Cantidad', 10) 
+		);
+	dbms_output.put_line(rpad('-',20,'-'));
+	OPEN c_productos;		
+	LOOP
+		FETCH c_productos INTO r_productos;
+		EXIT WHEN c_productos%notfound;
+				dbms_output.put_line(
+					rpad(r_productos.codigo, 10) ||
+					rpad(r_productos.cantidad, 10) 
+				);
+			dbms_output.put_line(rpad('-',20,'-'));
+	END LOOP;
+	CLOSE c_productos;
+	dbms_output.put_line(rpad('#',5,'#'));	
+END;
 ```
 
  21 Para cada cliente mostrar su código y la suma total del importe de sus pedidos y gastos de envÍo
