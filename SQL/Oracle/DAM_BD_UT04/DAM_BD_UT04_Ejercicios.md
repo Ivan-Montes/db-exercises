@@ -1388,15 +1388,33 @@ WHERE
 ![24](./images/24.PNG "Formato 24")
 
 ```sql
-
+SELECT 
+	rpad(PR.CODIGO, 20, '-') AS "CODIGO_PROD", 
+	rpad(INITCAP(PR.NOMBRE), 20) AS "NOMBRE", 
+	Lpad(PR.PRECIO, 10, '-') AS "PRECIO"
+FROM 
+	PRODUCTOS PR
 ```
 
  25 Escribe los datos de los pedidos y su clientes con el siguiente formato:
 
-![25](./images/24.PNG "Formato 25")
+![25](./images/25.PNG "Formato 25")
 
 ```sql
 
+SELECT 
+	lpad(p.num, 10) AS "Nº Pedido",
+	trim(to_char(p.fecha, 'Day')) || ': ' ||
+	trim(to_char(p.fecha, 'dd/month')) ||
+	to_char(p.fecha, '/yyyy') AS "Fecha Pedido",
+	c.apellidos || ', ' || c.nombre AS "Nombre Completo"
+FROM
+	pedidos p
+INNER JOIN
+	clientes c
+	ON c.codigo = p.cliente
+ORDER BY 
+	p.num
 ```
 
  26 (Solo con subconsultas, sin combinar tablas) Datos de los clientes que han pedido el producto de nombre ‘PANTALON’
