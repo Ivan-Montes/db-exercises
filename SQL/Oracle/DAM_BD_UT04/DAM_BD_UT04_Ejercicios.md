@@ -881,20 +881,207 @@ FETCH FIRST ROW ONLY
  17 Datos del producto más caro del pedido 1
 
 ```sql
+SELECT
+	p.codigo, 
+	p.nombre, 
+	p.precio
+FROM 
+	productos p
+INNER JOIN
+	lineas l
+	ON l.producto = p.codigo
+WHERE 
+	l.NUM_PEDIDO = 1 AND 
+	p.PRECIO  >= ALL (	SELECT 
+							l2.importe / l2.cantidad
+						FROM
+							lineas l2
+						WHERE 
+							l2.NUM_PEDIDO = 1)
+```
 
+```
+DECLARE
+
+	CURSOR c_productos IS
+	SELECT
+			p.codigo, 
+			p.nombre, 
+			p.precio
+		FROM 
+			productos p
+		INNER JOIN
+			lineas l
+			ON l.producto = p.codigo
+		WHERE 
+			l.NUM_PEDIDO = 1 AND 
+			p.PRECIO  >= ALL (	SELECT 
+									l2.importe / l2.cantidad
+								FROM
+									lineas l2
+								WHERE 
+									l2.NUM_PEDIDO = 1);
+						
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',30,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 10) ||
+			rpad('Nombre', 10) ||
+			lpad('Precio', 10) 
+		);
+	dbms_output.put_line(rpad('-',30,'-'));
+	FOR r_productos IN c_productos
+	LOOP
+		dbms_output.put_line(
+			rpad(r_productos.codigo, 10) ||
+			rpad(r_productos.nombre, 10) ||
+			lpad(r_productos.precio, 10) 
+		);
+	dbms_output.put_line(rpad('-',30,'-'));
+	END LOOP;	
+	dbms_output.put_line(rpad('#',5,'#'));	
+END;
 ```
 
  18 Datos del producto más caro de cada pedido (con una consulta correlacionada)
 
 ```sql
+SELECT
+	p.codigo, 
+	p.nombre, 
+	p.precio,
+	l.num_pedido
+FROM 
+	productos p
+INNER JOIN
+	lineas l
+	ON l.producto = p.codigo
+WHERE 
+	p.precio >= ALL (
+					SELECT 
+						l2.importe / l2.cantidad
+					FROM
+						lineas l2
+					WHERE 
+						l2.num_pedido = l.num_pedido 
+					)
+ORDER BY
+	l.num_pedido DESC 
+```
+ 
+```
+DECLARE
 
+	CURSOR c_productos IS
+	SELECT
+			p.codigo, 
+			p.nombre, 
+			p.precio,
+			l.num_pedido
+		FROM 
+			productos p
+		INNER JOIN
+			lineas l
+			ON l.producto = p.codigo
+		WHERE 
+			p.precio >= ALL (
+							SELECT 
+								l2.importe / l2.cantidad
+							FROM
+								lineas l2
+							WHERE 
+								l2.num_pedido = l.num_pedido 
+							)
+		ORDER BY
+			l.num_pedido DESC ;
+						
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',40,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 10) ||
+			rpad('Nombre', 10) ||
+			lpad('Precio', 10) ||
+			lpad('NºPedido', 10) 
+		);
+	dbms_output.put_line(rpad('-',40,'-'));
+	FOR r_productos IN c_productos
+	LOOP
+		dbms_output.put_line(
+			rpad(r_productos.codigo, 10) ||
+			rpad(r_productos.nombre, 10) ||
+			lpad(r_productos.precio, 10) ||
+			lpad(r_productos.num_pedido, 10) 
+		);
+	dbms_output.put_line(rpad('-',40,'-'));
+	END LOOP;	
+	dbms_output.put_line(rpad('#',5,'#'));	
+END;
 ```
  
  19 Código de cada cliente y cantidad total que se ha gastado en 2016
 
 ```sql
+SELECT
+	p.cliente AS "Cod" ,
+	sum(p.total) AS "Total"
+FROM 
+	pedidos p
+WHERE 
+	EXTRACT(YEAR FROM p.FECHA) = 2016
+GROUP BY 
+	p.cliente
+ORDER BY
+	sum(p.total) DESC 
+```
 
 ```
+ DECLARE
+
+	TYPE t_productos IS RECORD
+	(
+		codigo pedidos.cliente%TYPE,
+		cantidad number
+	);
+
+	CURSOR c_productos IS
+		SELECT
+		p.cliente AS "Cod" ,
+		sum(p.total) AS "Total"
+		FROM 
+			pedidos p
+		WHERE 
+			EXTRACT(YEAR FROM p.FECHA) = 2016
+		GROUP BY 
+			p.cliente
+		ORDER BY
+			sum(p.total) DESC ;
+		
+	r_productos t_productos;
+
+BEGIN
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',20,'-'));
+	dbms_output.put_line(
+			rpad('Cod', 10) ||
+			rpad('Cantidad', 10) 
+		);
+	dbms_output.put_line(rpad('-',20,'-'));
+	OPEN c_productos;		
+	LOOP
+		FETCH c_productos INTO r_productos;
+		EXIT WHEN c_productos%notfound;
+				dbms_output.put_line(
+					rpad(r_productos.codigo, 10) ||
+					rpad(r_productos.cantidad, 10) 
+				);
+			dbms_output.put_line(rpad('-',20,'-'));
+	END LOOP;
+	CLOSE c_productos;
+	dbms_output.put_line(rpad('#',5,'#'));	
+END;
+ ```
  
  20 Cantidad total gastada y código de cliente de los que menos han gastado en 2016
 
