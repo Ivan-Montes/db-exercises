@@ -1579,6 +1579,52 @@ END;
  30 Pedidos con el mínimo nº de días previsto de espera
 
 ```sql
-
+SELECT 
+	num,
+	( fecha_prevista - fecha ) AS "Días"
+FROM
+	pedidos
+WHERE 
+	( fecha_prevista - fecha ) <= ALL(
+									SELECT (p1.fecha_prevista - p1.fecha)
+									FROM PEDIDOS p1
+	)
+ORDER BY
+	num 
 ```
 
+```
+DECLARE 
+    CURSOR c_pedidos IS
+        SELECT 
+			num,
+			( fecha_prevista - fecha ) AS "DIAS"
+		FROM
+			pedidos
+		WHERE 
+			( fecha_prevista - fecha ) <= ALL(
+											SELECT (p1.fecha_prevista - p1.fecha)
+											FROM PEDIDOS p1
+			)
+		ORDER BY
+			num  ;
+BEGIN	
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',20,'-'));
+	dbms_output.put_line(
+			lpad('Número', 10) ||
+			lpad('Días', 10) 
+		);
+	dbms_output.put_line(rpad('-',20,'-'));
+
+	FOR r_pedidos IN c_pedidos
+	LOOP		
+		dbms_output.put_line(
+			lpad(r_pedidos.num, 10) ||
+			lpad(r_pedidos.dias, 10)  
+		);
+	dbms_output.put_line(rpad('-',20,'-'));
+	END LOOP;
+	dbms_output.put_line(rpad('#',5,'#'));
+END;
+```
