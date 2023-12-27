@@ -2,7 +2,7 @@
 
 Consultas para la base de datos de Microsoft "Northwind". Originalmente para SQL Server pero portada a Oracle XE
 
-![Northwind](./images/Northwind_E-R_Diagram.png "Nothwind E-R" )   
+![Northwind](./images/northwind_er.png "Nothwind E-R" )   
  	      
 ## Consultas   
        
