@@ -362,19 +362,13 @@ ORDER BY
 ```
 
 ```
-DECLARE
-	
-	TYPE t_pedidos_clientes IS RECORD (
-		l_cod_cliente pedidos.cliente%TYPE,
-		l_nombre_cliente varchar2(64),
-		l_cantidad_pedidos varchar2(64)
-	);	
+DECLARE	
 
 	CURSOR c_pedidos_clientes IS
 		SELECT 
-			p.cliente,
-			(SELECT c.nombre || ' ' || c.apellidos FROM clientes c WHERE c.codigo = p.cliente),
-			count(p.num)
+			p.cliente AS "L_COD_CLIENTE",
+			(SELECT c.nombre || ' ' || c.apellidos FROM clientes c WHERE c.codigo = p.cliente) AS "L_NOMBRE_CLIENTE",
+			count(p.num) AS "L_CANTIDAD_PEDIDOS"
 		FROM
 			pedidos p
 		WHERE 
@@ -382,9 +376,7 @@ DECLARE
 		GROUP BY
 			p.cliente
 		ORDER BY
-			count(p.num) DESC;
-		
-	r_pedidos_clientes t_pedidos_clientes;
+			"L_CANTIDAD_PEDIDOS" DESC;
 
 BEGIN
 	dbms_output.put_line(rpad('#',5,'#'));
@@ -395,18 +387,15 @@ BEGIN
 			lpad('Nº Pedidos', 10) 
 		);
 	dbms_output.put_line(rpad('-',40,'-'));
-	OPEN c_pedidos_clientes;
+	FOR r_pedidos_clientes IN c_pedidos_clientes
 	LOOP
-		FETCH c_pedidos_clientes INTO r_pedidos_clientes;
-		EXIT WHEN c_pedidos_clientes%notfound;	
-			dbms_output.put_line(
-				rpad(r_pedidos_clientes.l_cod_cliente, 5) ||
-				rpad(r_pedidos_clientes.l_nombre_cliente, 25) ||
-				lpad(r_pedidos_clientes.l_cantidad_pedidos, 10)
-			);	
-			dbms_output.put_line(rpad('-',40,'-'));
+		dbms_output.put_line(
+			rpad(r_pedidos_clientes.l_cod_cliente, 5) ||
+			rpad(r_pedidos_clientes.l_nombre_cliente, 25) ||
+			lpad(r_pedidos_clientes.l_cantidad_pedidos, 10)
+		);	
+		dbms_output.put_line(rpad('-',40,'-'));
 	END LOOP;
-	CLOSE c_pedidos_clientes;
 	dbms_output.put_line(rpad('#',5,'#'));
 	
 END;
@@ -434,20 +423,12 @@ HAVING
 
 ```
 DECLARE
-
-	TYPE t_clientes_pedidos IS record(
-		l_cod clientes.codigo%TYPE,
-		l_nombre varchar2(64),
-		l_num_pedidos number
-	);
-
-	r_clientes_pedidos t_clientes_pedidos;
 	
 	CURSOR c_clientes_pedidos IS
 		SELECT 
-			c.codigo, 
-			c.nombre || ' ' || c.apellidos,
-			count(p.NUM)
+			c.codigo AS "L_COD", 
+			(c.nombre || ' ' || c.apellidos) AS "L_NOMBRE",
+			count(p.NUM) AS "L_NUM_PEDIDOS"
 		FROM
 			clientes c
 		INNER JOIN
@@ -470,18 +451,15 @@ BEGIN
 			lpad('Nº Pedidos', 10) 
 		);
 	dbms_output.put_line(rpad('-',40,'-'));
-	OPEN c_clientes_pedidos;
+	FOR r_clientes_pedidos IN c_clientes_pedidos
 	LOOP
-		FETCH c_clientes_pedidos INTO r_clientes_pedidos;
-		EXIT WHEN c_clientes_pedidos%notfound;
-			dbms_output.put_line(
-				rpad(r_clientes_pedidos.l_cod,5) ||
-				rpad(r_clientes_pedidos.l_nombre, 25) ||
-				lpad(r_clientes_pedidos.l_num_pedidos, 10) 
-			);		
-			dbms_output.put_line(rpad('-',40,'-'));
+		dbms_output.put_line(
+			rpad(r_clientes_pedidos.l_cod,5) ||
+			rpad(r_clientes_pedidos.l_nombre, 25) ||
+			lpad(r_clientes_pedidos.l_num_pedidos, 10) 
+		);		
+		dbms_output.put_line(rpad('-',40,'-'));
 	END LOOP;
-	CLOSE c_clientes_pedidos;
 	dbms_output.put_line(rpad('#',5,'#'));
 END;
 ```
@@ -1111,16 +1089,10 @@ HAVING
 ```
 DECLARE
 
-	TYPE t_productos IS RECORD
-	(
-		l_codigo pedidos.cliente%TYPE,
-		l_cantidad number
-	);
-
 	CURSOR c_productos IS
 		SELECT 
-			p.cliente,
-			sum(p.total)
+			p.cliente AS "COD",
+			sum(p.total) AS "CANTIDAD"
 		FROM
 			pedidos p
 		WHERE 
@@ -1137,9 +1109,8 @@ DECLARE
 							EXTRACT (YEAR FROM  p2.FECHA) = 2016
 						GROUP BY
 							p2.cliente 
-						);
-		
-	r_productos t_productos;
+						);	
+	
 
 BEGIN
 	dbms_output.put_line(rpad('#',5,'#'));
@@ -1149,17 +1120,15 @@ BEGIN
 			rpad('Cantidad', 10) 
 		);
 	dbms_output.put_line(rpad('-',20,'-'));
-	OPEN c_productos;		
+	
+	FOR r_productos IN c_productos
 	LOOP
-		FETCH c_productos INTO r_productos;
-		EXIT WHEN c_productos%notfound;
-				dbms_output.put_line(
-					rpad(r_productos.l_codigo, 10) ||
-					rpad(r_productos.l_cantidad, 10) 
-				);
+		dbms_output.put_line(
+			rpad(r_productos.cod, 10) ||
+			rpad(r_productos.cantidad, 10) 
+		);
 			dbms_output.put_line(rpad('-',20,'-'));
 	END LOOP;
-	CLOSE c_productos;
 	dbms_output.put_line(rpad('#',5,'#'));	
 END;
 ```
@@ -1558,8 +1527,55 @@ END;
  29 Lista de todos los pedidos con mostrando también los días previstos de espera para el envío
 
 ```sql
+SELECT
+	num,
+	total,
+	cliente,
+	( fecha_prevista - fecha ) AS "Días"
+FROM 
+	pedidos
+ORDER BY
+	"Días" DESC 
+```
+
 
 ```
+DECLARE 
+    CURSOR c_pedidos IS
+        SELECT
+            num,
+            total,
+            cliente,
+            ( FECHA_PREVISTA - fecha ) AS "DIAS"
+        FROM 
+            pedidos
+        ORDER BY
+            "DIAS" DESC ;
+BEGIN	
+	dbms_output.put_line(rpad('#',5,'#'));
+	dbms_output.put_line(rpad('-',40,'-'));
+	dbms_output.put_line(
+			rpad('Número', 10) ||
+			rpad('Total', 10) ||
+			rpad('Cliente', 10) ||
+			rpad('Días', 10) 
+		);
+	dbms_output.put_line(rpad('-',40,'-'));
+
+	FOR r_pedidos IN c_pedidos
+	LOOP		
+		dbms_output.put_line(
+			rpad(r_pedidos.num, 10) ||
+			rpad(r_pedidos.total, 10)||
+			rpad(r_pedidos.cliente, 10) ||
+			rpad(r_pedidos.dias, 10)  
+		);
+	dbms_output.put_line(rpad('-',40,'-'));
+	END LOOP;
+	dbms_output.put_line(rpad('#',5,'#'));
+END;
+```
+
  30 Pedidos con el mínimo nº de días previsto de espera
 
 ```sql
