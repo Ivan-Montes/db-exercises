@@ -1603,9 +1603,9 @@ DECLARE
 			pedidos
 		WHERE 
 			( fecha_prevista - fecha ) <= ALL(
-											SELECT (p1.fecha_prevista - p1.fecha)
-											FROM PEDIDOS p1
-			)
+														SELECT (p1.fecha_prevista - p1.fecha
+														FROM PEDIDOS p1
+														)
 		ORDER BY
 			num  ;
 BEGIN	
