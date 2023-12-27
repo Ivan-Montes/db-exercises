@@ -870,14 +870,15 @@ INNER JOIN
 	ON l.producto = p.codigo
 WHERE 
 	l.NUM_PEDIDO = 1 AND 
-	p.PRECIO  >= ALL (	SELECT 
-							l2.importe / l2.cantidad
-						FROM
-							lineas l2
-						WHERE 
-							l2.NUM_PEDIDO = 1)
+	p.PRECIO  >= ALL
+			(		
+			SELECT
+				l2.importe / l2.cantida
+			FRO
+				lineas l
+			WHERE
+				l2.NUM_PEDIDO = 1
 ```
-
 ```
 DECLARE
 
@@ -964,13 +965,13 @@ DECLARE
 			ON l.producto = p.codigo
 		WHERE 
 			p.precio >= ALL (
-							SELECT 
-								l2.importe / l2.cantidad
-							FROM
-								lineas l2
-							WHERE 
-								l2.num_pedido = l.num_pedido 
-							)
+					SELECT 
+						l2.importe / l2.cantidad
+					FROM
+						lineas l2
+					WHERE 
+						l2.num_pedido = l.num_pedido 
+					)
 		ORDER BY
 			l.num_pedido DESC ;
 						
@@ -1074,16 +1075,17 @@ WHERE
 GROUP BY
 	p.cliente 
 HAVING
-	sum(p.total) <= ALL(
-						SELECT 
-							SUM(p2.total)	
-						FROM
-							pedidos p2
-						WHERE 
-							EXTRACT (YEAR FROM  p2.FECHA) = 2016
-						GROUP BY
-							p2.cliente 
-						)
+	sum(p.total) <= ALL
+			(
+				SELECT 
+					SUM(p2.total)	
+				FROM
+					pedidos p2
+				WHERE 
+					EXTRACT (YEAR FROM  p2.FECHA) = 2016
+				GROUP BY
+					p2.cliente 
+			)
 ```
 
 ```
@@ -1100,17 +1102,17 @@ DECLARE
 		GROUP BY
 			p.cliente 
 		HAVING
-			sum(p.total) <= ALL(
-						SELECT 
-							SUM(p2.total)	
-						FROM
-							pedidos p2
-						WHERE 
-							EXTRACT (YEAR FROM  p2.FECHA) = 2016
-						GROUP BY
-							p2.cliente 
-						);	
-	
+			sum(p.total) <= ALL
+				(
+					SELECT 
+						SUM(p2.total)	
+					FROM
+						pedidos p2
+					WHERE 
+						EXTRACT (YEAR FROM  p2.FECHA) = 2016
+					GROUP BY
+						p2.cliente 
+				);
 
 BEGIN
 	dbms_output.put_line(rpad('#',5,'#'));
@@ -1395,26 +1397,26 @@ FROM
 	CLIENTES 
 WHERE 
 	codigo IN (
+		SELECT 
+			cliente
+		FROM
+			PEDIDOS 
+		WHERE 
+			num IN (
 				SELECT 
-					cliente
+					num_pedido
 				FROM
-					PEDIDOS 
+					lineas
 				WHERE 
-					num IN (
-							SELECT 
-								num_pedido
-							FROM
-								lineas
-							WHERE 
-								producto = (
-								SELECT 
-									codigo
-								FROM
-									productos 
-								WHERE 
-									nombre LIKE 'PANTALÓN'
-								)
-							));
+					producto = (
+					SELECT 
+						codigo
+					FROM
+						productos 
+					WHERE 
+						nombre LIKE 'PANTALÓN'
+					)
+				));
 ```
  27 (Sin subconsultas) Datos de los clientes que han pedido el producto de nombre ‘PANTALON’
 
@@ -1451,12 +1453,12 @@ FROM
 	pedidos p
 WHERE 
 	p.total > ALL(
-					SELECT 
-						AVG(p2.total)
-					FROM
-						pedidos p2
-					WHERE 
-						p.cliente = p2.cliente
+			SELECT 
+				AVG(p2.total)
+			FROM
+				pedidos p2
+			WHERE 
+				p.cliente = p2.cliente
 				)
 ```
 
