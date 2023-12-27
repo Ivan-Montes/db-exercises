@@ -873,11 +873,11 @@ WHERE
 	p.PRECIO  >= ALL
 			(		
 			SELECT
-				l2.importe / l2.cantida
+				l2.importe / l2.cantidad
 			FRO
-				lineas l
+				lineas l2
 			WHERE
-				l2.NUM_PEDIDO = 1
+				l2.NUM_PEDIDO = 1)
 ```
 ```
 DECLARE
@@ -894,12 +894,13 @@ DECLARE
 			ON l.producto = p.codigo
 		WHERE 
 			l.NUM_PEDIDO = 1 AND 
-			p.PRECIO  >= ALL (	SELECT 
-									l2.importe / l2.cantidad
-								FROM
-									lineas l2
-								WHERE 
-									l2.NUM_PEDIDO = 1);
+			p.PRECIO  >= ALL (	
+					SELECT 
+						l2.importe / l2.cantidad
+					FROM
+						lineas l2
+					WHERE 
+						l2.NUM_PEDIDO = 1);
 						
 BEGIN
 	dbms_output.put_line(rpad('#',5,'#'));
@@ -1587,9 +1588,12 @@ SELECT
 FROM
 	pedidos
 WHERE 
-	( fecha_prevista - fecha ) <= ALL(
-									SELECT (p1.fecha_prevista - p1.fecha)
-									FROM PEDIDOS p1
+	( fecha_prevista - fecha ) <= ALL
+			(
+				SELECT 
+					(p1.fecha_prevista - p1.fecha)
+				FROM 
+					PEDIDOS p1
 	)
 ORDER BY
 	num 
@@ -1605,12 +1609,12 @@ DECLARE
 			pedidos
 		WHERE 
 			( fecha_prevista - fecha ) <= ALL
-						(
-							SELECT
-								(p1.fecha_prevista - p1.fecha 
-							FROM 
-								PEDIDOS p1
-						)
+					(
+						SELECT
+							(p1.fecha_prevista - p1.fecha 
+						FROM 
+							PEDIDOS p1
+					)
 		ORDER BY
 			num  ;
 BEGIN	
