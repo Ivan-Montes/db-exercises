@@ -53,22 +53,55 @@ ORDER BY
    4.Liste los campos de la tabla productos que tengan exactamente un precio de 18, 19 y 10 dolares. 
 
 ```sql
-
+SELECT
+    productid,
+    productname,
+    unitprice,
+    discontinued
+FROM
+    products
+WHERE
+    unitprice  IN(18,19,10)
+ORDER BY
+    unitprice DESC
 ```
 
    5.Encontrar todos los apellidos (LastName) en la tabla Employees que comiencen con la letra S. Use el carácter comodín %. 
    
 ```sql
-
+SELECT
+    employeeid AS "ID",
+    lastname AS "APELLIDO",
+    firstname AS "NOMBRE",
+    title AS "PUESTO"    
+FROM
+    employees
+WHERE
+    lastname like 'S%'
+ORDER BY
+    employeeid,
+    lastnam
 ```
 
    6.Para recuperar el apellido de los Empleados cuya primera letra comienza entre A y M. Utilice el comodín [ ].
 
 ```sql
-
+SELECT
+    employeeid AS "ID",
+    lastname AS "APELLIDO",
+    firstname AS "NOMBRE",
+    title AS "PUESTO"    
+FROM
+    employees
+WHERE
+    REGEXP_LIKE( lastname, '^[A-M]' )
+ORDER BY
+    lastname,
+    firstname
+    ;
 ```
 
-   7.Usar Base de Datos Pubs . Para recuperar la información de un autor cuyo ID comienza con el numero 724, sabiendo que cada ID tiene el formato de tres dígitos seguidos por un guión, seguido por dos dígitos, otro guión y finalmente cuatro dígitos. Utilizar el comodín _ .
+   7.Usar Base de Datos Pubs. Para recuperar la información de un autor cuyo ID comienza con el numero 724, sabiendo que cada ID tiene el formato de tres dígitos seguidos por un guión, seguido por dos dígitos, otro guión y finalmente cuatro dígitos. Utilizar el comodín _ .
 
 ```sql
 
