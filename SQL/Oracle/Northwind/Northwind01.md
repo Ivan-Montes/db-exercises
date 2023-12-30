@@ -19,10 +19,19 @@ ORDER BY
     employeeid
 ```
 
-2.Utilizando la tabla Employees liste las columnas EmployeeID, LastName, FirstName, además envié dos mensajes en conjunto con cada fila utilizando para cada uno una de las opciones de literales. 
+2.Utilizando la tabla Employees liste las columnas EmployeeID, LastName, FirstName, además envíe dos mensajes en conjunto con cada fila utilizando para cada uno una de las opciones de literales. 
 
 ```sql
-
+SELECT
+    employeeid AS "Id",
+    lastname AS "Apellido",
+    firstname AS "Nombre",
+    'Indefinido' AS "Contrato",
+    'Activo' AS "Estado"
+FROM
+    employees
+ORDER BY
+    employeeid
 ```
 
    3.Suponga que queremos ver aquellos productos (Tabla Products) cuyos valores se encuentran entre los 4 y 20 Dólares. 
