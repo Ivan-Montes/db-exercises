@@ -37,7 +37,17 @@ ORDER BY
    3.Suponga que queremos ver aquellos productos (Tabla Products) cuyos valores se encuentran entre los 4 y 20 Dólares. 
 
 ```sql
-
+SELECT
+    productid,
+    productname,
+    unitprice,
+    discontinued
+FROM
+    products
+WHERE
+    unitprice  BETWEEN 4 AND 20
+ORDER BY
+    unitprice DESC
 ```
 
    4.Liste los campos de la tabla productos que tengan exactamente un precio de 18, 19 y 10 dolares. 
