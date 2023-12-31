@@ -108,7 +108,14 @@ ORDER BY
 7.Usar Base de Datos Pubs. Para recuperar la información de un autor cuyo ID comienza con el numero 724, sabiendo que cada ID tiene el formato de tres dígitos seguidos por un guión, seguido por dos dígitos, otro guión y finalmente cuatro dígitos. Utilizar el comodín _ .
 
 ```sql
-
+SELECT
+    * 
+from 
+    AUTHORS
+WHERE 
+    au_id LIKE '724-__-____'
+ORDER BY
+    au_id
 ```
 
 8.Usar base de datos Northwind . Liste todos los campos de la tabla Suppliers cuya columna Región sea NULL. 
