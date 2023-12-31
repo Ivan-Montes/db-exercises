@@ -1,8 +1,10 @@
-# Northwind 01
+# Northwind & Pubs 01
 
-Consultas para la base de datos de Microsoft "Northwind". Originalmente para SQL Server pero portada a Oracle XE
+Consultas para la base de datos de Microsoft "Northwind & Pubs". Originalmente para SQL Server pero portada a Oracle XE
 
-![Northwind](./images/northwind_er.png "Nothwind E-R" )   
+[![Diagrama ER de BD Northwind](./images/northwind_er.png "Nothwind E-R")](https://github.com/Microsoft/sql-server-samples/tree/master/samples/databases/northwind-pubs)
+
+[![Diagrama ER de BD Pubs](./images/pubs_er.png "Pubs E-R")](https://github.com/Microsoft/sql-server-samples/tree/master/samples/databases/northwind-pubs)
  	      
 ## Consultas   
        
