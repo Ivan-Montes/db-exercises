@@ -121,43 +121,74 @@ ORDER BY
 8.Usar base de datos Northwind . Liste todos los campos de la tabla Suppliers cuya columna Región sea NULL. 
 
 ```sql
-
+SELECT
+    supplierid AS "ID",
+    companyname AS "Nombre",
+    contactname AS "Contacto",
+    city AS "Ciudad",
+    region
+from 
+    SUPPLIERS
+WHERE 
+    REGION is NULL
+ORDER BY
+    companyname
 ```
 
-9.Usando la base de dato PUBS. Calcula la suma de las ventas del año hasta la fecha (ytd_sales) de todos los libros de la tabla titles . 
+9.Usando la base de dato PUBS. Calcula la suma de las ventas de un año hasta la fecha de hoy (ytd_sales) de todos los libros de la tabla titles . 
 
 ```sql
-
+SELECT
+    SUM(ytd_sales) AS "Ventas"
+FROM 
+    titles
 ```
 
 10.Usando la base de datos PUBS. Puede averiguar el precio promedio de todos los libros si se duplicaran los precios ( tabla titles ). 
 
 ```sql
-
+SELECT
+    ROUND(AVG(price*2),2) AS "Promedio"
+FROM 
+    titles
 ```
 
 11 Usando la base de dato PUBS. Muestre el mayor valor de las las ventas del año (ytd_sales) de todos los libros de la tabla titles. 
 
 ```sql
-
+SELECT
+    MAX(ytd_sales) AS "Valor Max"
+FROM 
+    titles
 ```
 
 12.Usando la base de dato PUBS. Muestre el mínimo valor de las ventas del año (ytd_sales) de todos los libros de la tabla titles. 
 
 ```sql
-
+SELECT
+    MIN(ytd_sales) AS "Valor Max"
+FROM 
+    titles
 ```
 
 13.Usando la base de datos PUBS. Cuente las filas de la tabla titles. 
 
 ```sql
-
+SELECT
+    COUNT(*) AS "Nº DE FILAS"
+FROM 
+    titles
 ```
 
 14.Usando la base de datos PUBS. Cuente los datos de la tabla titles, cuyo tipo (TYPE) sea business . 
 
 ```sql
-
+SELECT
+    COUNT(*) AS "Nº DE FILAS"
+FROM 
+    titles t
+WHERE
+    TRIM(t.TYPE) like 'business'
 ```
 
 15.Utilizando la base de datos PUBS. Liste las suma de las ventas por año ( ytd_sales ) hasta la fecha, clasificándolas por tipo (TYPE) de titulo (titles). 
