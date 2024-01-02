@@ -194,7 +194,19 @@ WHERE
 15.Utilizando la base de datos PUBS. Liste las suma de las ventas por año ( ytd_sales ) hasta la fecha, clasificándolas por tipo (TYPE) de titulo (titles). 
 
 ```sql
-
+SELECT
+    CASE
+        WHEN SUM(ytd_sales) IS NULL
+            THEN 0
+            ELSE SUM(ytd_sales)
+    END AS "Ventas",
+    INITCAP(t.type) AS "Tipo"
+FROM 
+    titles t
+GROUP BY
+    t.type
+ORDER BY
+    "Ventas" DESC
 ```
 
 16.Liste las sumas de las ventas por año (ydt_sales) hasta la fecha, clasificándolas por tipo (TYPE) y pub_id.
