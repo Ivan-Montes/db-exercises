@@ -212,13 +212,45 @@ ORDER BY
 16.Liste las sumas de las ventas por año (ydt_sales) hasta la fecha, clasificándolas por tipo (TYPE) y pub_id.
 
 ```sql
-
+SELECT
+    CASE
+        WHEN SUM(ytd_sales) IS NULL
+            THEN 0
+            ELSE SUM(ytd_sales)
+    END AS "Ventas",
+    INITCAP(t.type) AS "Tipo",
+    pub_id
+FROM 
+    titles t
+GROUP BY
+    t.type,
+    pub_id
+ORDER BY
+    pub_id,
+    "Ventas" DESC
 ```
 
 17.Utilizando el ultimo ejemplo. Liste solamente los grupos cuyo pub_id sea igual a 0877. Pista, usar having
 
 ```sql
-
+SELECT
+    CASE
+        WHEN SUM(ytd_sales) IS NULL
+            THEN 0
+            ELSE SUM(ytd_sales)
+    END AS "Ventas",
+    INITCAP(t.type) AS "Tipo",
+    pub_id
+FROM 
+    titles t
+GROUP BY
+    t.type,
+    pub_id
+HAVING
+    pub_id = '0877'
+ORDER BY
+    pub_id,
+    "Ventas" DESC
 ```
 
 18.De la base de datos PUBS. Combine las tablas stores y discounts para mostrar que tienda (stor_id) ofrece un descuento y el tipo de descuento (discounttype).
