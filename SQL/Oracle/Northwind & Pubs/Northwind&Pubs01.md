@@ -273,19 +273,58 @@ ORDER BY
 19.Utilice el mismo ejemplo anterior solo utilice en el from la instrucción FULL OUTER JOIN. 
 
 ```sql
-
+SELECT
+    s.stor_id AS "ID Tienda",
+    s.stor_name AS "Nombre",
+    d.discounttype AS "Tipo de Descuento",
+    d.discount AS "Descuento"
+FROM 
+    stores s
+FULL OUTER JOIN
+    discounts d
+    ON d.stor_id = s.stor_id
+WHERE
+    d.stor_id IS NOT NULL    
+ORDER BY
+    s.stor_id
 ```
 
 20.Utilice el mismo ejemplo anterior solo utilice en el from la instrucción LEFT OUTER JOIN. 
 
 ```sql
-
+SELECT
+    s.stor_id AS "ID Tienda",
+    s.stor_name AS "Nombre",
+    d.discounttype AS "Tipo de Descuento",
+    d.discount AS "Descuento"
+FROM 
+    stores s
+LEFT OUTER JOIN
+    discounts d
+    ON d.stor_id = s.stor_id
+WHERE
+    d.stor_id IS NOT NULL    
+ORDER BY
+    s.stor_id
 ```
 
 21.Utilice el mismo ejemplo anterior solo utilice en el from la instrucción RIGHT OUTER JOIN. 
 
 ```sql
-
+SELECT
+    s.stor_id AS "ID Tienda",
+    s.stor_name AS "Nombre",
+    d.discounttype AS "Tipo de Descuento",
+    d.discount AS "Descuento"
+FROM 
+    stores s
+RIGHT OUTER JOIN
+    discounts d
+    ON d.stor_id = s.stor_id
+WHERE
+    d.stor_id IS NOT NULL    
+ORDER BY
+    s.stor_id
 ```
 
 22.Usando base de datos Northwind . Muestre los Productos (ID del Producto, Nombre y Precio Unitario) que tengan un precio unitario igual al Máximo. 
