@@ -370,5 +370,72 @@ ORDER BY
 24.Realice una unión de las consultas anidadas vistas anteriormente. Usando ambas opciones de unión (Con y Sin ALL).
   
 ```sql
+SELECT
+    productid AS "Id",
+    productname AS "Nombre",
+    unitprice AS "Precio Unitario"
+FROM 
+    products
+WHERE
+    unitprice = (
+            SELECT
+                MAX(p1.unitprice)
+            FROM
+                products p1                
+    )
+    
+UNION
 
+SELECT
+    productid AS "Id",
+    productname AS "Nombre",
+    unitprice AS "Precio Unitario"
+FROM 
+    products
+WHERE
+    unitprice = (
+            SELECT
+                MIN(p1.unitprice)
+            FROM
+                products p1                
+    )
+ORDER BY
+    "Precio Unitario" ASC
+;
 ```
+
+```sql
+SELECT
+    productid AS "Id",
+    productname AS "Nombre",
+    unitprice AS "Precio Unitario"
+FROM 
+    products
+WHERE
+    unitprice = (
+            SELECT
+                MAX(p1.unitprice)
+            FROM
+                products p1                
+    )
+    
+UNION ALL
+
+SELECT
+    productid AS "Id",
+    productname AS "Nombre",
+    unitprice AS "Precio Unitario"
+FROM 
+    products
+WHERE
+    unitprice = (
+            SELECT
+                MIN(p1.unitprice)
+            FROM
+                products p1                
+    )
+ORDER BY
+    "Precio Unitario" ASC
+;
+```
+
