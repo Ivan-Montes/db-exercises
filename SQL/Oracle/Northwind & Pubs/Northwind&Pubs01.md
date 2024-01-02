@@ -330,13 +330,41 @@ ORDER BY
 22.Usando base de datos Northwind . Muestre los Productos (ID del Producto, Nombre y Precio Unitario) que tengan un precio unitario igual al Máximo. 
 
 ```sql
-
+SELECT
+    productid AS "Id",
+    productname AS "Nombre",
+    unitprice AS "Precio Unitario"
+FROM 
+    products
+WHERE
+    unitprice = (
+            SELECT
+                MAX(p1.unitprice)
+            FROM
+                products p1                
+    )
+ORDER BY
+    productname
 ```
 
 23.Usando base de datos Northwind . Muestre los Productos (ID del Producto, Nombre y Precio Unitario) que tengan un precio unitario igual al Mínimo. 
 
 ```sql
-
+SELECT
+    productid AS "Id",
+    productname AS "Nombre",
+    unitprice AS "Precio Unitario"
+FROM 
+    products
+WHERE
+    unitprice = (
+            SELECT
+                MIN(p1.unitprice)
+            FROM
+                products p1                
+    )
+ORDER BY
+    productname
 ```
 
 24.Realice una unión de las consultas anidadas vistas anteriormente. Usando ambas opciones de unión (Con y Sin ALL).
