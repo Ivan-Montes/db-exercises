@@ -256,7 +256,18 @@ ORDER BY
 18.De la base de datos PUBS. Combine las tablas stores y discounts para mostrar que tienda (stor_id) ofrece un descuento y el tipo de descuento (discounttype).
 
 ```sql
-
+SELECT
+    s.stor_id AS "ID Tienda",
+    s.stor_name AS "Nombre",
+    d.discounttype AS "Tipo de Descuento",
+    d.discount AS "Descuento"
+FROM 
+    stores s
+INNER JOIN
+    discounts d
+    ON d.stor_id = s.stor_id
+ORDER BY
+    s.stor_id
 ```
 
 19.Utilice el mismo ejemplo anterior solo utilice en el from la instrucción FULL OUTER JOIN. 
