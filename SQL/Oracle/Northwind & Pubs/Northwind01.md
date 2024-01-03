@@ -12,7 +12,24 @@ Consultas para la base de datos de Microsoft "Northwind". Originalmente para SQL
 1.Crear una consulta que muestre el nombre de empleado y el número de empleados que cada uno de los empleados tiene a su cargo.
 
 ```sql
-
+SELECT
+    lastname || ', ' || firstname AS "Nombre Completo",
+    "Nºde Empleados"
+FROM
+    employees e
+INNER JOIN 
+        (SELECT
+            reportsto,
+            count(employeeid) AS "Nºde Empleados"
+        FROM
+            employees
+        GROUP BY
+            reportsto
+        ORDER BY
+            reportsto) e1
+        ON e1.reportsto = e.employeeid
+ORDER BY
+    lastname
 ```
 
 2.Mostrar una consulta que muestre el nombre del producto, el número de unidades totales vendidas, de aquel producto del que mas unidades haya vendido la empresa.
