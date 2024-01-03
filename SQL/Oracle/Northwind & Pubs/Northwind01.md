@@ -60,7 +60,24 @@ HAVING
 3.Mostrar una consulta que obtenga el nombre de empleado, el número de pedidos que ha tramitado, y el dinero que ha generado en la empresa, de todos aquellos empleados que han tramitado pedidos. En caso de existir algún empleado que no haya tramitado pedidos se mostrará en las columnas número de pedidos y generado un valor nulo.
 
 ```sql
-
+SELECT
+    e.lastname || ', ' || e.firstname AS "Nombre Completo",
+    COUNT(o.orderid) AS "Nº de Pedidos",
+    ROUND(SUM(oo.unitprice * oo.quantity),2) AS "Ventas"
+FROM
+    employees e
+LEFT JOIN 
+    orders o
+    ON o.employeeid = e.employeeid
+LEFT JOIN 
+     orderdetails oo
+     ON oo.orderid = o.orderid
+GROUP BY
+    e.employeeid,
+    e.lastname,
+    e.firstname
+ORDER BY
+    "Nº de Pedidos" DESC
 ```
 
 4.Modificar el ejercicio anterior para que muestre en los valores nulos de las columnas número de pedidos y dinero generado un 0.
