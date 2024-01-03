@@ -35,7 +35,26 @@ ORDER BY
 2.Mostrar una consulta que muestre el nombre del producto, el número de unidades totales vendidas, de aquel producto del que mas unidades haya vendido la empresa.
 
 ```sql
-
+SELECT
+    p.productname,
+    SUM(quantity)
+FROM
+    products p
+INNER JOIN 
+     orderdetails o
+     ON o.productid = p.productid
+GROUP BY
+    p.productname
+HAVING
+    SUM(quantity) >= ALL
+            (
+            SELECT 
+                SUM(o1.quantity)
+            FROM
+                orderdetails o1
+            GROUP BY
+                o1.productid
+            )
 ```
 
 3.Mostrar una consulta que obtenga el nombre de empleado, el número de pedidos que ha tramitado, y el dinero que ha generado en la empresa, de todos aquellos empleados que han tramitado pedidos. En caso de existir algún empleado que no haya tramitado pedidos se mostrará en las columnas número de pedidos y generado un valor nulo.
