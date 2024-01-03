@@ -83,7 +83,32 @@ ORDER BY
 4.Modificar el ejercicio anterior para que muestre en los valores nulos de las columnas número de pedidos y dinero generado un 0.
 
 ```sql
-
+SELECT
+    e.lastname || ', ' || e.firstname AS "Nombre Completo",
+    CASE 
+        WHEN COUNT(o.orderid) IS NULL
+        THEN 0
+        ELSE COUNT(o.orderid)
+        END AS "Nº de Pedidos",
+    CASE
+        WHEN SUM(oo.unitprice * oo.quantity) IS NULL
+        THEN 0
+        ELSE ROUND(SUM(oo.unitprice * oo.quantity),2)
+    END AS "Dinero Generado"    
+FROM
+    employees e
+LEFT JOIN 
+    orders o
+    ON o.employeeid = e.employeeid
+LEFT JOIN 
+     orderdetails oo
+     ON oo.orderid = o.orderid
+GROUP BY
+    e.employeeid,
+    e.lastname,
+    e.firstname
+ORDER BY
+    "Nº de Pedidos" DESC
 ```
 
 5.Modificar el ejercicio anterior para que muestre en lugar de un 0 las cadenas "Sin Pedidos" y "Sin dinero".
