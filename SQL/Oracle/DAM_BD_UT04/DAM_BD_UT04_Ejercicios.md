@@ -1311,7 +1311,7 @@ WHERE
 	p.total >= ALL 
 		(
 		SELECT	
-			max(pp.total) AS "Total"		
+			pp.total AS "Total"		
 		FROM
 			pedidos pp
 		)
@@ -1319,7 +1319,7 @@ WHERE
 	p.total <= ALL 
 		(
 		SELECT	
-			min(pp.total) AS "Total"		
+			pp.total AS "Total"		
 		FROM
 			pedidos pp
 		)
@@ -1331,7 +1331,7 @@ SELECT
 FROM
 	pedidos p 
 WHERE 
-	p.total >= ALL 
+	p.total =  
 		(
 		SELECT	
 			max(pp.total) AS "Total"		
@@ -1346,7 +1346,7 @@ SELECT
 FROM
 	pedidos p 
 WHERE 
-	p.total <= ALL 
+	p.total =  
 		(
 		SELECT	
 			min(pp.total) AS "Total"		
