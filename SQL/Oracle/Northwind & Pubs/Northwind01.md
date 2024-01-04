@@ -77,7 +77,7 @@ GROUP BY
     e.lastname,
     e.firstname
 ORDER BY
-    "Nº de Pedidos" DESC
+    COUNT(o.orderid) DESC
 ```
 
 4.Modificar el ejercicio anterior para que muestre en los valores nulos de las columnas número de pedidos y dinero generado un 0.
@@ -108,7 +108,7 @@ GROUP BY
     e.lastname,
     e.firstname
 ORDER BY
-    "Nº de Pedidos" DESC
+    COUNT(o.orderid) DESC
 ```
 
 5.Modificar el ejercicio anterior para que muestre en lugar de un 0 las cadenas "Sin Pedidos" y "Sin dinero".
@@ -139,7 +139,7 @@ GROUP BY
     e.lastname,
     e.firstname
 ORDER BY
-    "Nº de Pedidos" DESC
+    COUNT(o.orderid) DESC
 ```
 
 6.Crear una consulta que muestre el nombre de empleado, el número de pedidos tramitado por cada empleado, de aquellos empleados que han tramitado mas de 15 pedidos.
