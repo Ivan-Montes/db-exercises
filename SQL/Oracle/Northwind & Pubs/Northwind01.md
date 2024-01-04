@@ -145,7 +145,26 @@ ORDER BY
 6.Crear una consulta que muestre el nombre de empleado, el número de pedidos tramitado por cada empleado, de aquellos empleados que han tramitado mas de 15 pedidos.
 
 ```sql
-
+SELECT
+   e.lastname || ', ' || e.firstname AS "Nombre Completo",
+   CASE 
+        WHEN COUNT(o.orderid) IS NULL OR COUNT(o.orderid) = 0
+        THEN 'Sin Pedidos'
+        ELSE TO_CHAR(COUNT(o.orderid))
+        END AS "Nº de Pedidos"
+FROM
+    employees e
+LEFT JOIN 
+    orders o
+    ON o.employeeid = e.employeeid
+GROUP BY
+    e.employeeid,
+    e.lastname,
+    e.firstname
+HAVING
+    COUNT(o.orderid) > 15
+ORDER BY
+    COUNT(o.orderid) DESC
 ```
 
 7.Crear una consulta que muestre el nombre del cliente, el número de pedidos que nos ha realizado el cliente, el dinero que nos ha dejado en la empresa, de todos los clientes que sean de USA y que nos han realizado mas de 5 pedidos.
