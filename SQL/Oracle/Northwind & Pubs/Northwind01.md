@@ -170,7 +170,27 @@ ORDER BY
 7.Crear una consulta que muestre el nombre del cliente, el número de pedidos que nos ha realizado el cliente, el dinero que nos ha dejado en la empresa, de todos los clientes que sean de USA y que nos han realizado mas de 5 pedidos.
 
 ```sql
-
+SELECT
+   c.companyname AS "Nombre",
+   count(o.orderid) AS "Nº de Pedidos",
+   ROUND(SUM(oo.unitprice * oo.quantity),2) AS "Ventas"
+FROM
+    customers c
+INNER JOIN 
+    orders o
+    ON o.customerid = c.customerid    
+INNER JOIN 
+     orderdetails oo
+     ON oo.orderid = o.orderid
+WHERE
+    c.country = 'USA'
+GROUP BY
+    c.customerid,
+    c.companyname
+HAVING
+    COUNT(o.orderid) > 5
+ORDER BY
+    COUNT(o.orderid) DESC
 ```
 
 8.Crear una consulta que muestre el nombre del jefe y el número de empleados a su cargo de aquel jefe que mas empleados tenga a su cargo.
