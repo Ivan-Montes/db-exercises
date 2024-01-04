@@ -114,7 +114,32 @@ ORDER BY
 5.Modificar el ejercicio anterior para que muestre en lugar de un 0 las cadenas "Sin Pedidos" y "Sin dinero".
 
 ```sql
-
+SELECT
+    e.lastname || ', ' || e.firstname AS "Nombre Completo",
+    CASE 
+        WHEN COUNT(o.orderid) IS NULL OR COUNT(o.orderid) = 0
+        THEN 'Sin Pedidos'
+        ELSE TO_CHAR(COUNT(o.orderid))
+        END AS "Nº de Pedidos",
+    CASE
+        WHEN SUM(oo.unitprice * oo.quantity) IS NULL
+        THEN 'Sin dinero'
+        ELSE TO_CHAR(ROUND(SUM(oo.unitprice * oo.quantity),2))
+    END AS "Dinero Generado"    
+FROM
+    employees e
+LEFT JOIN 
+    orders o
+    ON o.employeeid = e.employeeid
+LEFT JOIN 
+     orderdetails oo
+     ON oo.orderid = o.orderid
+GROUP BY
+    e.employeeid,
+    e.lastname,
+    e.firstname
+ORDER BY
+    "Nº de Pedidos" DESC
 ```
 
 6.Crear una consulta que muestre el nombre de empleado, el número de pedidos tramitado por cada empleado, de aquellos empleados que han tramitado mas de 15 pedidos.
