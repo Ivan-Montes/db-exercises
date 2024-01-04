@@ -224,7 +224,27 @@ HAVING
 9.Obtener el nombre del cliente y el número de pedidos del cliente que mas pedidos ha realizado en la empresa.
 
 ```sql
-
+SELECT
+   c.companyname AS "Nombre",
+   COUNT(o.orderid) AS "Nº de Pedidos"
+FROM
+    customers c
+INNER JOIN 
+    orders o
+    ON o.customerid = c.customerid
+GROUP BY
+    c.customerid,
+    c.companyname
+HAVING 
+    COUNT(o.orderid) >= ALL
+                (
+                SELECT
+                    COUNT(*)
+                FROM
+                    orders
+                GROUP BY
+                    customerid
+                )
 ```
 
 
