@@ -247,9 +247,34 @@ HAVING
                 )
 ```
 
-
 10.Obtener el nombre del cliente y el volumen de negocio del cliente que mas volumen de negocio nos ha dejado en la empresa.
 
 ```sql
-
+SELECT
+   c.companyname AS "Nombre",
+   ROUND(SUM(oo.unitprice * oo.quantity),2) AS "Dinero Generado" 
+FROM
+    customers c
+INNER JOIN 
+    orders o
+    ON o.customerid = c.customerid
+INNER JOIN 
+     orderdetails oo
+     ON oo.orderid = o.orderid
+GROUP BY
+    c.customerid,
+    c.companyname
+HAVING 
+    ROUND(SUM(oo.unitprice * oo.quantity),2) >= ALL
+                (
+                SELECT
+                    ROUND(SUM(unitprice * quantity),2)
+                FROM
+                    orderdetails o1 
+                INNER JOIN 
+                    orders o2
+                    ON o2.orderid = o1.orderid
+                GROUP BY
+                    customerid
+                )
 ```
