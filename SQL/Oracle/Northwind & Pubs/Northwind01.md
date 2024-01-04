@@ -196,7 +196,29 @@ ORDER BY
 8.Crear una consulta que muestre el nombre del jefe y el número de empleados a su cargo de aquel jefe que mas empleados tenga a su cargo.
 
 ```sql
-
+SELECT
+    e.reportsto AS "Jefe Id",
+    COUNT(*) AS "Nº de Empleados",
+    ee.lastname || ', ' || ee.firstname AS "Nombre Completo"
+FROM
+    employees e
+INNER JOIN
+    employees ee
+    ON ee.employeeid = e.reportsto
+GROUP BY
+    e.reportsto,
+    ee.lastname,
+    ee.firstname
+HAVING
+    COUNT(*) >= ALL
+            (
+            SELECT
+                COUNT(*)
+            FROM
+                employees
+            GROUP BY
+                reportsto
+            )
 ```
 
 9.Obtener el nombre del cliente y el número de pedidos del cliente que mas pedidos ha realizado en la empresa.
