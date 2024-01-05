@@ -1,3 +1,30 @@
+TRUNCATE TABLE employee;
+TRUNCATE TABLE pub_info;
+TRUNCATE TABLE jobs;
+TRUNCATE TABLE discounts;
+TRUNCATE TABLE roysched;
+TRUNCATE TABLE sales;
+TRUNCATE TABLE stores;
+TRUNCATE TABLE titleauthor;
+TRUNCATE TABLE titles;
+TRUNCATE TABLE publishers;
+TRUNCATE TABLE authors;
+
+DROP TABLE employee;
+DROP TABLE pub_info;
+DROP TABLE jobs;
+DROP TABLE discounts;
+DROP TABLE roysched;
+DROP TABLE sales;
+DROP TABLE stores;
+DROP TABLE titleauthor;
+DROP TABLE titles;
+DROP TABLE publishers;
+DROP TABLE authors;
+
+DROP SEQUENCE job_id_seq;
+
+
 CREATE TABLE authors
 (
    au_id          VARCHAR2(12)
