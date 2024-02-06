@@ -44,37 +44,96 @@ ORDER BY
 4.- Listar sin repetir, todos los nombres de grupos de los departamentos. 
 
 ```sql
-
+SELECT DISTINCT
+	GroupName
+FROM
+	HumanResources.Department
+ORDER BY
+	GroupName
 ```
 
 5.- Crear una consulta que muestre el Nombre, numero, color, precio y tamaño de los productos que cuesten mas de $10,00
 
 ```sql
-
+SELECT 
+	ProductNumber,
+	Name,
+	Color,
+	Size,
+	ListPrice
+FROM
+	Production.Product
+WHERE
+	ListPrice > 10
+ORDER BY
+	ListPrice DESC
 ```
 
 6.- Escribir y ejecutar una sentencia SELECT que devuelva los productos cuyo número de producto comience con LJ
 
 ```sql
-
+SELECT 
+	ProductNumber,
+	Name,
+	Color,
+	Size,
+	ListPrice
+FROM
+	Production.Product
+WHERE
+	ProductNumber LIKE 'LJ%'
+ORDER BY
+	ProductNumber
 ```
 
 7.- Crear una consulta que muestre el número y nombre en una sola columna, separados por un guión para todos los productos de color ‘Black’.
 
 ```sql
-
+SELECT 
+	ProductNumber + ' - ' + Name,
+	Color
+FROM
+	Production.Product
+WHERE
+	Color LIKE 'black'
+ORDER BY
+	ProductNumber
 ```
 
 8.- Crear una consulta que muestre los productos cuyos precios estén entre 10,00 y 100,00.
 
 ```sql
-
+SELECT 
+	ProductNumber,
+	Name,
+	Color,
+	Size,
+	ListPrice
+FROM
+	Production.Product
+WHERE
+	ListPrice BETWEEN 10 AND 100
+ORDER BY
+	ListPrice DESC
 ```
 
 9.- Crear una consulta que muestre los productos que hayan salido a la venta entre los año 2001 y 2003, ordenar el resultado por dicha fecha en forma descendente. Tabla a utilizar: Production.Product, columna: SellStartDate
 
 ```sql
-
+SELECT 
+	ProductNumber,
+	Name,
+	Color,
+	Size,
+	ListPrice,
+	SellStartDate
+FROM
+	Production.Product
+WHERE
+	YEAR(SellStartDate) BETWEEN 2011 AND 2013
+ORDER BY
+	SellStartDate DESC,
+	ListPrice DESC
 ```
 
 10.- Crear una consulta que muestre los productos ordenado alfabéticamente dentro de cada subcategoría solamente para las subcategorías 1 y 2. Production.Product, columna: ProductSubcategoryID
