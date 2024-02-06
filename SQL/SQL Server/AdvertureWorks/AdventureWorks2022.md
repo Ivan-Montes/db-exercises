@@ -5,22 +5,40 @@ Consultas para la base de datos de Microsoft AdvertureWorks del [backup 2022](ht
 
 ## Consultas
 
-1.- Mostrar solamente el nro. de empleado (EmployeeID) y cargo (Title).
+1.- Mostrar solamente el nro. de empleado (BusinessEntityID) y cargo (Title).
 
 ```sql
-
+SELECT
+	BusinessEntityID, Title
+FROM
+	Person.Person
+ORDER BY
+	BusinessEntityID
 ```
 
 2.- Escribir una consulta que muestre el pago histórico de los empleados y un incremento del 20% en 3 formatos diferentes, con las siguientes cabeceras “Sin formato”, “Redondeado a 1 digito decimal”, “truncado a 1 digito”. Usar función ROUND.
 
 ```sql
-
+SELECT
+	(Rate * PayFrequency) * 1.20 AS "Sin formato",
+	FORMAT(ROUND((Rate * PayFrequency) * 1.20, 1), 'N1') AS "Redondeado a 1 digito decimal",
+	FORMAT(ROUND((Rate * PayFrequency) * 1.20, 1, 1), 'N1') AS "truncado a 1 digito"
+FROM
+	HumanResources.EmployeePayHistory
+ORDER BY
+	BusinessEntityID
 ```
 
 3.- Listar Todos los nombres y grupos de los distintos departamentos
 
 ```sql
-
+SELECT
+	Name,
+	GroupName
+FROM
+	HumanResources.Department
+ORDER BY
+	GroupName
 ```
 
 4.- Listar sin repetir, todos los nombres de grupos de los departamentos. 
