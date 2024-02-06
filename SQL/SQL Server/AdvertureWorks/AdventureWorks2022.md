@@ -117,7 +117,7 @@ ORDER BY
 	ListPrice DESC
 ```
 
-9.- Crear una consulta que muestre los productos que hayan salido a la venta entre los año 2001 y 2003, ordenar el resultado por dicha fecha en forma descendente. Tabla a utilizar: Production.Product, columna: SellStartDate
+9.- Crear una consulta que muestre los productos que hayan salido a la venta entre los año 2011 y 2013, ordenar el resultado por dicha fecha en forma descendente. Tabla a utilizar: Production.Product, columna: SellStartDate
 
 ```sql
 SELECT 
@@ -139,43 +139,102 @@ ORDER BY
 10.- Crear una consulta que muestre los productos ordenado alfabéticamente dentro de cada subcategoría solamente para las subcategorías 1 y 2. Production.Product, columna: ProductSubcategoryID
 
 ```sql
-
+SELECT 
+	Name,
+	ProductSubcategoryID
+FROM
+	Production.Product
+WHERE
+	ProductSubcategoryID = 1 OR ProductSubcategoryID = 2 
+GROUP BY
+	ProductSubcategoryID,
+	Name
+ORDER BY
+	Name
 ```
 
 11.- Crear una consulta que muestre los empleados y su cargo cuyo login comience con la letra ‘k’ (Posición 17). Utilizar la tabla: HumanResources.Employee y columna: LoginID
 
 ```sql
-
+SELECT 
+	LoginID,
+	BusinessEntityID,
+	JobTitle
+FROM
+	HumanResources.Employee
+WHERE
+	SUBSTRING(LoginID,17,1) LIKE 'k%'
+ORDER BY
+	LoginID
 ```
 
 12.- Crear una consulta para mostrar los 10 empleados con mayor cantidad de horas de vacaciones. Utilizar la tabla: HumanResources.Employee y columnas: LoginID, Title, VacationHours
 
 ```sql
-
+SELECT TOP 10
+	LoginID,
+	JobTitle,
+	VacationHours
+FROM
+	HumanResources.Employee
+ORDER BY
+	VacationHours DESC,
+	JobTitle
 ```
 
-13.- Crear una consulta que permita calcular un incremento de 10% para los que tienen menos de 50 hs. De vacaciones, 10% para los que tienen entre 50 y 70 hs. De vacaciones y un 5 % para el resto. Utilizar la tabla: HumanResources.Employee y columna: VacationHours
+13.- Crear una consulta que permita calcular un incremento de 15% para los que tienen menos de 50 hs. De vacaciones, 10% para los que tienen entre 50 y 70 hs. De vacaciones y un 5 % para el resto. Utilizar la tabla: HumanResources.Employee y columna: VacationHours
 
 ```sql
-
+SELECT
+	LoginID,
+	JobTitle,
+	VacationHours,
+	CASE 
+		WHEN VacationHours < 50 THEN VacationHours * 1.15
+		WHEN VacationHours < 70 THEN VacationHours * 1.05
+		ELSE VacationHours * 1.10
+	END AS "Vacaciones Normalizadas"
+FROM
+	HumanResources.Employee
+ORDER BY
+	VacationHours DESC,
+	JobTitle
 ```
 
 14.- Informar la cantidad de Empleados masculinos y femeninos (Gender = ‘M’ y Gender = ‘F’) de la tabla: HumanResources.Employee
 
 ```sql
-
+SELECT 
+	Gender,
+	COUNT(Gender) AS "Cantidad"
+FROM
+	HumanResources.Employee
+GROUP BY
+	Gender
+ORDER BY
+	"Cantidad" DESC
 ```
 
 15.- Informar la suma total de edades, la cantidad de personas y el promedio de edad.
 
 ```sql
-
+SELECT 
+	COUNT(BusinessEntityID) AS "Cantidad Personas",
+	AVG(DATEDIFF(YEAR, BirthDate, CONVERT(DATE, GETDATE()))) AS "Media de edad",
+	SUM(DATEDIFF(YEAR, BirthDate, CONVERT(DATE, GETDATE()))) AS "Suma de edades"
+FROM
+	HumanResources.Employee
 ```
 
 16.- Mostrar la cantidad total de productos, el peso total de los productos y el peso promedio de cada uno de ellos. Colocar etiquetas representativas en las columnas.
 
 ```sql
-
+SELECT 
+	COUNT(ProductId) AS "Cantidad de Productos",
+	CAST(ROUND(AVG(Weight),2) AS NUMERIC(12,2)) AS "Peso Medio de los Productos",
+	SUM(Weight) AS "Peso Total de los Productos"
+FROM
+	Production.Product
 ```
 
 17.- Mostrar la cantidad total de productos por subcategoría. Utilizar la tabla: Production.Product y la columna: ProductSubcategoryID
