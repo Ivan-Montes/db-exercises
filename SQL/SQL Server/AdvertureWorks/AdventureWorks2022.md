@@ -240,38 +240,111 @@ FROM
 17.- Mostrar la cantidad total de productos por subcategoría. Utilizar la tabla: Production.Product y la columna: ProductSubcategoryID
 
 ```sql
-
+SELECT 
+	COUNT(ProductId) AS "Cantidad de Productos",
+	ProductSubcategoryID AS "Subcategoría"
+FROM
+	Production.Product
+GROUP BY
+	ProductSubcategoryID
+ORDER BY
+	"Cantidad de Productos" DESC
 ```
 
 18.- Mostrar el monto del producto de mayor costo para cada subcategoría, excluir los productos cuya subcategoría sea nula. Utilizar la tabla: Production.Product y la columna ProductSubcategory
 
 ```sql
-
+SELECT 
+	ProductSubcategoryID AS "Subcategoría",
+	ListPrice
+FROM
+	Production.Product p
+WHERE
+	ProductSubcategoryID IS NOT NULL
+GROUP BY
+	ProductSubcategoryID,
+	ListPrice
+HAVING
+	 ListPrice >= ALL (
+			SELECT pp.ListPrice
+			FROM Production.Product pp
+			WHERE pp.ProductSubcategoryID = p.ProductSubcategoryID
+			)
+ORDER BY
+	ProductSubcategoryID
 ```
 
 19.- Mostrar la cantidad total de unidades de medidas diferentes utilizadas en la tabla Productos.
 Utilizar la tabla: Production.Product y la columna SizeUnitMeasureCode
 
 ```sql
-
+SELECT
+	COUNT(*)
+FROM
+	(
+	SELECT 
+		SizeUnitMeasureCode
+	FROM
+		Production.Product
+	WHERE
+		SizeUnitMeasureCode IS NOT NULL
+	GROUP BY
+		SizeUnitMeasureCode
+	) p
 ```
 
-20.- Mostrar el promedio de precios por subcategorías solo para los que superen los $100. Utilizar la tabla: Production.Product y las columnas ProductSubcategoryID y ListPrice
+20.- Mostrar el promedio de precios por subcategorías solo para los promedios que superen los $100. Utilizar la tabla: Production.Product y las columnas ProductSubcategoryID y ListPrice
 
 ```sql
-
+SELECT 
+	ProductSubcategoryID AS "Subcategoría",
+	AVG(ListPrice) AS "Precio Medio"
+FROM
+	Production.Product p
+WHERE
+	ProductSubcategoryID IS NOT NULL
+GROUP BY
+	ProductSubcategoryID
+HAVING	
+	AVG(ListPrice) > 100
+ORDER BY
+	AVG(ListPrice) DESC
 ```
 
 21.- Mostrar en una sola consulta la cantidad de productos de color blanco, negro y amarillo. Utilizar la tabla: Production.Product y la columna Color
 
 ```sql
-
+SELECT 
+	Color,
+	COUNT(COLOR) AS "Cantidd"
+FROM
+	Production.Product p
+WHERE
+	Color IN('white', 'black','yellow')
+GROUP BY
+	Color
+ORDER BY
+	"Cantidd" DESC
 ```
 
 22.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre de la subcategoría a la que pertenecen cada uno de los productos. Mostrar solamente los departamentos que tienen color asignado. Utilizar para esta consulta las tablas: Production.Product y Production.ProductSubcategory
 
 ```sql
-
+SELECT 
+	p.ProductID,
+	p.Name,
+	p.Color,
+	ps.ProductSubcategoryID,
+	ps.Name
+FROM
+	Production.Product p
+INNER JOIN
+	Production.ProductSubcategory ps
+	ON ps.ProductSubcategoryID = p.ProductSubcategoryID
+WHERE
+	Color IS NOT NULL
+ORDER BY
+	ps.ProductSubcategoryID
 ```
 
 23.- Mostrar que variedad de colores de productos existen para las subcategorías que estén ubicadas entre 1 y 20
