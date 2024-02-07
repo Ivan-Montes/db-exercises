@@ -350,7 +350,17 @@ ORDER BY
 23.- Mostrar que variedad de colores de productos existen para las subcategorías que estén ubicadas entre 1 y 20
 
 ```sql
-
+SELECT 
+	Color
+FROM
+	Production.Product
+WHERE
+	Color IS NOT NULL AND 
+	ProductSubcategoryID BETWEEN 1 AND 20
+GROUP BY
+	Color
+ORDER BY
+	Color
 ```
 
 24.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre de la subcategoría y el número y nombre de la categoría a la que pertenecen cada uno de los productos. Usar alias para identificar los nombres de categoría y subcategoría
@@ -360,49 +370,177 @@ Production.ProductSubcategory
 Production.ProductCategory
 
 ```sql
+SELECT 
+	p.ProductID,
+	p.Name AS "Nombre Producto",
+	ps.ProductSubcategoryID,
+	ps.Name AS "Nombre Subcategoría",
+	pc.ProductCategoryID,
+	pc.Name AS "Nombre Categoría"
+FROM
+	Production.Product p
+INNER JOIN
+	Production.ProductSubcategory ps
+	ON ps.ProductSubcategoryID = p.ProductSubcategoryID
+INNER JOIN
+	Production.ProductCategory pc
+	ON pc.ProductCategoryID = ps.ProductCategoryID
 
+ORDER BY
+	pc.ProductCategoryID,
+	ps.ProductSubcategoryID,
+	p.Name 
 ```
 
 25.- Idem anterior solo para la categoría Bikes
 
 ```sql
-
+SELECT 
+	p.ProductID,
+	p.Name AS "Nombre Producto",
+	ps.ProductSubcategoryID,
+	ps.Name AS "Nombre Subcategoría",
+	pc.ProductCategoryID,
+	pc.Name AS "Nombre Categoría"
+FROM
+	Production.Product p
+INNER JOIN
+	Production.ProductSubcategory ps
+	ON ps.ProductSubcategoryID = p.ProductSubcategoryID
+INNER JOIN
+	Production.ProductCategory pc
+	ON pc.ProductCategoryID = ps.ProductCategoryID
+WHERE
+	pc.Name LIKE 'bikes'
+ORDER BY
+	pc.ProductCategoryID,
+	ps.ProductSubcategoryID,
+	p.Name 
 ```
 
 26.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre de la subcategoría a la que pertenecen cada uno de los productos. En la misma consulta mostrar los productos que no tienen subcategoría asignada.
 
 ```sql
-
+SELECT 
+	p.ProductID,
+	p.Name AS "Nombre Producto",
+	ps.ProductSubcategoryID,
+	ps.Name AS "Nombre Subcategoría"
+FROM
+	Production.Product p
+LEFT JOIN
+	Production.ProductSubcategory ps
+	ON ps.ProductSubcategoryID = p.ProductSubcategoryID
+ORDER BY
+	ps.ProductSubcategoryID,
+	p.Name 
 ```
 
 27.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre del modelo del producto. En la misma consulta mostrar todos los modelos que no están asignados a ningún producto.
 
 ```sql
-
+SELECT 
+	p.ProductID,
+	p.Name AS "Nombre Producto",
+	pm.ProductModelID,
+	pm.Name AS "Nombre Modelo"
+FROM
+	Production.Product p
+RIGHT JOIN
+	Production.ProductModel pm
+	ON pm.ProductModelID = p.ProductModelID
+ORDER BY
+	p.ProductID,
+	p.Name
 ```
 
 28.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre del modelo del producto. En la misma consulta mostrar todos los modelos que no están asignados a ningún producto y los productos que no tengan asignados ningún modelo.
 
 ```sql
-
+SELECT 
+	p.ProductID,
+	p.Name AS "Nombre Producto",
+	pm.ProductModelID,
+	pm.Name AS "Nombre Modelo"
+FROM
+	Production.Product p
+FULL JOIN
+	Production.ProductModel pm
+	ON pm.ProductModelID = p.ProductModelID
+ORDER BY
+	p.ProductID,
+	p.Name
 ```
 
 29.- Escriba una consulta que muestre los productos que tienen el mismo color que el producto de nombre ‘Chain’. Excluir al producto ‘Chain’ del listado.
 
 ```sql
-
+SELECT 
+	p.ProductID,
+	p.Name AS "Nombre Producto",
+	p.Color
+FROM
+	Production.Product p
+WHERE
+	Color LIKE (SELECT TOP 1 Color FROM Production.Product WHERE Name LIKE 'Chain') AND
+	Name NOT LIKE 'Chain'
+ORDER BY
+	p.Color,
+	p.ProductID,
+	p.Name
 ```
 
 30.- Escriba una consulta que muestre los productos cuyo precio estén por encima del precio promedio general, ordenar el resultado por precio del producto en forma ascendente
 
 ```sql
-
+SELECT 
+	p.ProductID,
+	p.Name AS "Nombre Producto",
+	p.ListPrice AS "Precio"
+FROM
+	Production.Product p
+WHERE
+	ListPrice > ALL
+			(SELECT AVG(pp.ListPrice)
+			FROM Production.Product pp)
+ORDER BY
+	p.ListPrice,
+	p.Name
 ```
 
 31.- Utilizando Subconsultas, Escriba una consulta que muestre los productos que pertenecen a la misma categoría a la que pertenece el producto “Road-150 Red, 62”.
 
 ```sql
-
+SELECT 
+	p.ProductID,
+	p.Name AS "Nombre Producto",
+	p.ListPrice AS "Precio",
+	p.ProductSubcategoryID AS "Subcategoría"
+FROM
+	Production.Product p
+WHERE
+	ProductSubcategoryID IN
+		(SELECT
+			ProductSubcategoryID
+		FROM
+			Production.ProductSubcategory
+		WHERE
+			ProductCategoryID = (
+			SELECT
+				ProductCategoryID
+			FROM
+				Production.ProductSubcategory
+			WHERE
+				ProductSubcategoryID = (
+					SELECT 
+						pp.ProductSubcategoryID
+					FROM 
+						Production.Product pp
+					WHERE 
+						pp.Name LIKE 'Road-150 Red, 62')
+			))
+ORDER BY
+	p.Name
 ```
 
 32.- Mostrar todos los productos que hayan tenido ventas en el año 2003. Utilizar las tablas: Production.Product y Production.TransactionHistory Columna: TransactionDate
