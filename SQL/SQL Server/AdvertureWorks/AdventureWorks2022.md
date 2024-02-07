@@ -543,14 +543,53 @@ ORDER BY
 	p.Name
 ```
 
-32.- Mostrar todos los productos que hayan tenido ventas en el año 2003. Utilizar las tablas: Production.Product y Production.TransactionHistory Columna: TransactionDate
+32.- Mostrar todos los productos que hayan tenido ventas en el año 2013. Utilizar las tablas: Production.Product y Production.TransactionHistory Columna: TransactionDate
 
 ```sql
-
+SELECT
+	p.ProductID,
+	p.Name AS "Nombre Producto",
+	YEAR(t.TransactionDate) AS "Año"
+FROM
+	Production.Product p
+INNER JOIN
+	Production.TransactionHistory t
+	ON t.ProductID = p.ProductID
+WHERE
+	YEAR(t.TransactionDate) = 2013
+GROUP BY
+	p.ProductID,
+	p.Name,
+	YEAR(t.TransactionDate)
+ORDER BY
+	p.ProductID
 ```
 
 33.- Mostrar el nombre de los vendedores que hayan vendido al menos una unidad del o de los producto/s con menor precio. Utilizar las tablas: Purchasing.ProductVendor, Purchasing.Vendor, Production.Product (ListPrice)
 
 ```sql
-
+SELECT
+	pv.BusinessEntityID AS "ID",
+	v.Name AS "Nombre"
+FROM
+	Production.Product p
+INNER JOIN
+	Purchasing.ProductVendor pv
+	ON pv.ProductID = p.ProductID
+INNER JOIN
+	Purchasing.Vendor v
+	ON v.BusinessEntityID = pv.BusinessEntityID
+WHERE
+	p.ListPrice > 0 AND
+	p.ListPrice <= ALL  (
+			SELECT pp.ListPrice
+			FROM Production.Product pp
+			WHERE pp.ListPrice > 0
+			)
+GROUP BY
+	pv.BusinessEntityID,
+	v.Name
+ORDER BY
+	pv.BusinessEntityID
 ```
+
