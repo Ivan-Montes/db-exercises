@@ -300,7 +300,7 @@ SELECT
 	ProductSubcategoryID AS "Subcategoría",
 	AVG(ListPrice) AS "Precio Medio"
 FROM
-	Production.Product p
+	Production.Product
 WHERE
 	ProductSubcategoryID IS NOT NULL
 GROUP BY
@@ -316,9 +316,9 @@ ORDER BY
 ```sql
 SELECT 
 	Color,
-	COUNT(COLOR) AS "Cantidd"
+	COUNT(COLOR) AS "Cantidad"
 FROM
-	Production.Product p
+	Production.Product
 WHERE
 	Color IN('white', 'black','yellow')
 GROUP BY
@@ -476,18 +476,21 @@ ORDER BY
 
 ```sql
 SELECT 
-	p.ProductID,
-	p.Name AS "Nombre Producto",
-	p.Color
+	ProductID,
+	Name AS "Nombre Producto",
+	Color
 FROM
-	Production.Product p
+	Production.Product
 WHERE
-	Color LIKE (SELECT TOP 1 Color FROM Production.Product WHERE Name LIKE 'Chain') AND
+	Color LIKE (
+		SELECT TOP 1 Color 
+		FROM Production.Product 
+		WHERE Name LIKE 'Chain'
+		) AND
 	Name NOT LIKE 'Chain'
 ORDER BY
-	p.Color,
-	p.ProductID,
-	p.Name
+	ProductID,
+	Name
 ```
 
 30.- Escriba una consulta que muestre los productos cuyo precio estén por encima del precio promedio general, ordenar el resultado por precio del producto en forma ascendente
@@ -500,9 +503,10 @@ SELECT
 FROM
 	Production.Product p
 WHERE
-	ListPrice > ALL
-			(SELECT AVG(pp.ListPrice)
-			FROM Production.Product pp)
+	ListPrice > ALL (
+			SELECT AVG(pp.ListPrice)
+			FROM Production.Product pp
+			)
 ORDER BY
 	p.ListPrice,
 	p.Name
@@ -519,8 +523,8 @@ SELECT
 FROM
 	Production.Product p
 WHERE
-	ProductSubcategoryID IN
-		(SELECT
+	ProductSubcategoryID IN (
+		SELECT
 			ProductSubcategoryID
 		FROM
 			Production.ProductSubcategory
@@ -537,8 +541,8 @@ WHERE
 					FROM 
 						Production.Product pp
 					WHERE 
-						pp.Name LIKE 'Road-150 Red, 62')
-			))
+						pp.Name LIKE 'Road-150 Red, 62'
+			)))
 ORDER BY
 	p.Name
 ```
@@ -593,3 +597,221 @@ ORDER BY
 	pv.BusinessEntityID
 ```
 
+34.- Mostrar a todos los empleados que se encuentran en el departamento de manufactura y de aseguramiento de la calidad (Columna GroupName, dpto Manufacturing or QUALITY ASSURANCE, tabla DEPARTMENT)
+
+```sql
+SELECT 
+	p.LastName,
+	p.FirstName,
+	p.BusinessEntityID,
+	d.Name AS "Departamento",
+	d.GroupName AS "Grupo Departamental"
+FROM
+	HumanResources.Department d
+INNER JOIN
+	HumanResources.EmployeeDepartmentHistory ed
+	ON ed.DepartmentID = d.DepartmentID
+INNER JOIN
+	HumanResources.Employee e
+	ON e.BusinessEntityID = ed.BusinessEntityID
+INNER JOIN
+	Person.Person p
+	ON p.BusinessEntityID = e.BusinessEntityID
+WHERE
+	d.GroupName LIKE 'manufacturing' OR
+	d.GroupName LIKE 'QUALITY ASSURANCE'
+ORDER BY
+	p.LastName,
+	p.FirstName
+```
+
+35.- Indicar el listado de los empleados del sexo masculino y que son solteros
+
+```sql
+SELECT 
+	p.LastName,
+	p.FirstName,
+	p.BusinessEntityID,
+	e.Gender,
+	e.MaritalStatus
+FROM
+	HumanResources.Employee e
+INNER JOIN
+	Person.Person p
+	ON p.BusinessEntityID = e.BusinessEntityID
+WHERE
+	e.Gender LIKE 'M' AND
+	e.MaritalStatus LIKE 'S'
+ORDER BY
+	p.LastName,
+	p.FirstName
+```
+
+36.- Empleados cuyo apellido sea con la letra "S"
+
+```sql
+SELECT 
+	LastName,
+	FirstName,
+	BusinessEntityID
+FROM	
+	Person.Person 
+WHERE
+	LastName LIKE 'S%'
+ORDER BY
+	LastName,
+	FirstName
+```
+
+37.- Los empleados que son del estado de Florida
+
+```sql
+SELECT 
+	LastName,
+	FirstName,
+	p.BusinessEntityID,
+	s.StateProvinceID,
+	s.Name	
+FROM	
+	Person.Person p
+INNER JOIN
+	Person.BusinessEntity be
+	ON be.BusinessEntityID = p.BusinessEntityID
+INNER JOIN
+	Person.BusinessEntityAddress ba
+	ON ba.BusinessEntityID = be.BusinessEntityID
+INNER JOIN
+	Person.Address a
+	ON a.AddressID = ba.AddressID
+INNER JOIN
+	Person.StateProvince s
+	ON s.StateProvinceID = a.StateProvinceID
+WHERE
+	s.Name LIKE 'FLORIDA%'
+ORDER BY
+	LastName,
+	FirstName
+```
+
+38.- La suma de las ventas hechas por cada empleado, y agrupadas por año Tabla Sales.SalesPersonQuotaHistory y Person.Person
+
+```sql
+SELECT 
+	s.BusinessEntityID,
+	LastName,
+	FirstName,
+	SUM(SalesQuota) AS "Sumatorio Ventas",
+	YEAR(QuotaDate) AS "Año"
+FROM	
+	Sales.SalesPersonQuotaHistory s
+INNER JOIN
+	Person.Person p
+	ON p.BusinessEntityID = s.BusinessEntityID
+GROUP BY
+	s.BusinessEntityID,
+	YEAR(QuotaDate),
+	LastName,
+	FirstName
+ORDER BY
+	s.BusinessEntityID,
+	YEAR(QuotaDate) DESC
+```
+
+39.- El producto más vendido
+
+```sql
+SELECT
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID,
+	SUM(OrderQty) AS "Unidades Totales"
+	
+FROM
+	Sales.SalesOrderDetail s
+INNER JOIN
+	Production.Product p
+	ON p.ProductID = s.ProductID
+GROUP BY
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID
+HAVING
+	SUM(OrderQty) >= ALL (
+			SELECT SUM(OrderQty) 
+			FROM Sales.SalesOrderDetail 
+			GROUP BY ProductID
+			)
+ORDER BY
+	s.ProductID
+```
+
+40.- El producto menos vendido
+
+```sql
+SELECT
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID,
+	SUM(OrderQty) AS "Unidades Totales"
+	
+FROM
+	Sales.SalesOrderDetail s
+INNER JOIN
+	Production.Product p
+	ON p.ProductID = s.ProductID
+GROUP BY
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID
+HAVING
+	SUM(OrderQty) <= ALL (
+			SELECT SUM(OrderQty) 
+			FROM Sales.SalesOrderDetail 
+			GROUP BY ProductID
+			)
+ORDER BY
+	s.ProductID
+```
+
+41.- Listado de productos por número de ventas ordenado de mayor a menor
+
+```sql
+SELECT
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID,
+	SUM(OrderQty) AS "Unidades Totales"	
+FROM
+	Sales.SalesOrderDetail s
+INNER JOIN
+	Production.Product p
+	ON p.ProductID = s.ProductID
+GROUP BY
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID
+ORDER BY
+	SUM(OrderQty) DESC,
+	p.Name
+```
+
+42.- Las ventas por territorio
+
+```sql
+SELECT
+	SUM(SubTotal) AS "Total sin IVA ni portes",
+	SUM(TotalDue) AS "Total",
+	s.TerritoryID,
+	t.Name
+FROM
+	Sales.SalesOrderHeader s
+INNER JOIN
+	Sales.SalesTerritory t
+	ON t.TerritoryID = s.TerritoryID
+GROUP BY
+	s.TerritoryID,
+	t.Name
+ORDER BY
+	SUM(SubTotal) DESC,
+	SUM(TotalDue) DESC
+```
