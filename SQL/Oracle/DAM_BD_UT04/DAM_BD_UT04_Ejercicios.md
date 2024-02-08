@@ -33,11 +33,10 @@ SELECT
 FROM 
 	pedidos
 WHERE 
-	fecha > ( SELECT 
-				max(fecha) 
-			  FROM 
-				pedidos 
-			) - 60
+	fecha > ( 
+		SELECT MAX(fecha) 
+		FROM pedidos 
+		) - 60
 ```
 
 ```
@@ -939,13 +938,13 @@ INNER JOIN
 	ON l.producto = p.codigo
 WHERE 
 	p.precio >= ALL (
-					SELECT 
-						l2.importe / l2.cantidad
-					FROM
-						lineas l2
-					WHERE 
-						l2.num_pedido = l.num_pedido 
-					)
+			SELECT 
+				l2.importe / l2.cantidad
+			FROM
+				lineas l2
+			WHERE 
+				l2.num_pedido = l.num_pedido 
+			)
 ORDER BY
 	l.num_pedido DESC 
 ```
@@ -1076,16 +1075,15 @@ WHERE
 GROUP BY
 	p.cliente 
 HAVING
-	sum(p.total) <= ALL
-			(
-				SELECT 
-					SUM(p2.total)	
-				FROM
-					pedidos p2
-				WHERE 
-					EXTRACT (YEAR FROM  p2.FECHA) = 2016
-				GROUP BY
-					p2.cliente 
+	sum(p.total) <= ALL (
+			SELECT 
+				SUM(p2.total)	
+			FROM
+				pedidos p2
+			WHERE 
+				EXTRACT (YEAR FROM  p2.FECHA) = 2016
+			GROUP BY
+				p2.cliente 
 			)
 ```
 
@@ -1103,8 +1101,7 @@ DECLARE
 		GROUP BY
 			p.cliente 
 		HAVING
-			sum(p.total) <= ALL
-				(
+			sum(p.total) <= ALL (
 					SELECT 
 						SUM(p2.total)	
 					FROM
@@ -1454,13 +1451,13 @@ FROM
 	pedidos p
 WHERE 
 	p.total > ALL(
-			SELECT 
-				AVG(p2.total)
-			FROM
-				pedidos p2
-			WHERE 
-				p.cliente = p2.cliente
-				)
+		SELECT 
+			AVG(p2.total)
+		FROM
+			pedidos p2
+		WHERE 
+			p.cliente = p2.cliente
+			)
 ```
 
 ```
