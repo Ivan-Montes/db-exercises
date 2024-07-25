@@ -255,6 +255,18 @@ ORDER BY
 
 ```sql
 SELECT 
+	p.ProductSubcategoryID AS Subcategoria_ID,
+	MAX(p.listprice) AS Precio_Mayor
+FROM
+	Production.Product p
+WHERE
+	p.ProductSubcategoryID IS NOT NULL
+GROUP BY
+	p.ProductSubcategoryID
+```
+
+```sql
+SELECT 
 	ProductSubcategoryID AS "Subcategoría",
 	ListPrice
 FROM
