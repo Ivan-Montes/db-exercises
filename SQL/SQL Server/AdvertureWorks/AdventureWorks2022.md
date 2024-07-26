@@ -290,6 +290,17 @@ ORDER BY
 Utilizar la tabla: Production.Product y la columna SizeUnitMeasureCode
 
 ```sql
+SELECT 
+	COUNT(DISTINCT SizeUnitMeasureCode)
+FROM
+	Production.Product
+WHERE
+	SizeUnitMeasureCode IS NOT NULL
+GROUP BY
+	SizeUnitMeasureCode
+```
+
+```sql
 SELECT
 	COUNT(*)
 FROM
@@ -371,6 +382,18 @@ WHERE
 	ProductSubcategoryID BETWEEN 1 AND 20
 GROUP BY
 	Color
+ORDER BY
+	Color
+```
+
+```sql
+SELECT DISTINCT
+	Color
+FROM
+	Production.Product
+WHERE
+	Color IS NOT NULL AND 
+	ProductSubcategoryID BETWEEN 1 AND 20
 ORDER BY
 	Color
 ```
@@ -585,7 +608,7 @@ ORDER BY
 
 ```sql
 SELECT
-	pv.BusinessEntityID AS "ID",
+	pv.BusinessEntityID AS "Vendedor ID",
 	v.Name AS "Nombre"
 FROM
 	Production.Product p
@@ -602,9 +625,6 @@ WHERE
 			FROM Production.Product pp
 			WHERE pp.ListPrice > 0
 			)
-GROUP BY
-	pv.BusinessEntityID,
-	v.Name
 ORDER BY
 	pv.BusinessEntityID
 ```
