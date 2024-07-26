@@ -84,7 +84,7 @@ WHERE
     lastname like 'S%'
 ORDER BY
     employeeid,
-    lastnam
+    lastname
 ```
 
 6.Para recuperar el apellido de los Empleados cuya primera letra comienza entre A y M. Utilice el comodín [ ].
@@ -135,7 +135,7 @@ ORDER BY
     companyname
 ```
 
-9.Usando la base de dato PUBS. Calcula la suma de las ventas de un año hasta la fecha de hoy (ytd_sales) de todos los libros de la tabla titles . 
+9.Usando la base de datos PUBS. Calcula la suma de las ventas de un año hasta la fecha de hoy (ytd_sales) de todos los libros de la tabla titles . 
 
 ```sql
 SELECT
@@ -153,7 +153,7 @@ FROM
     titles
 ```
 
-11 Usando la base de dato PUBS. Muestre el mayor valor de las las ventas del año (ytd_sales) de todos los libros de la tabla titles. 
+11 Usando la base de datos PUBS. Muestre el mayor valor de las las ventas del año (ytd_sales) de todos los libros de la tabla titles. 
 
 ```sql
 SELECT
@@ -162,7 +162,7 @@ FROM
     titles
 ```
 
-12.Usando la base de dato PUBS. Muestre el mínimo valor de las ventas del año (ytd_sales) de todos los libros de la tabla titles. 
+12.Usando la base de datos PUBS. Muestre el mínimo valor de las ventas del año (ytd_sales) de todos los libros de la tabla titles. 
 
 ```sql
 SELECT
@@ -191,7 +191,7 @@ WHERE
     TRIM(t.TYPE) like 'business'
 ```
 
-15.Utilizando la base de datos PUBS. Liste las suma de las ventas por año ( ytd_sales ) hasta la fecha, clasificándolas por tipo (TYPE) de titulo (titles). 
+15.Utilizando la base de datos PUBS y la tabla titles. Liste las suma de las ventas por año ( ytd_sales ) hasta la fecha, clasificándolas por tipo (TYPE) de titulo (titles). 
 
 ```sql
 SELECT
@@ -270,7 +270,7 @@ ORDER BY
     s.stor_id
 ```
 
-19.Utilice el mismo ejemplo anterior solo utilice en el from la instrucción FULL OUTER JOIN. 
+19.Utilice el mismo ejemplo anterior solo utilice en el FROM la instrucción FULL OUTER JOIN. 
 
 ```sql
 SELECT
@@ -289,7 +289,7 @@ ORDER BY
     s.stor_id
 ```
 
-20.Utilice el mismo ejemplo anterior solo utilice en el from la instrucción LEFT OUTER JOIN. 
+20.Utilice el mismo ejemplo anterior solo utilice en el FROM la instrucción LEFT OUTER JOIN. 
 
 ```sql
 SELECT
@@ -308,7 +308,7 @@ ORDER BY
     s.stor_id
 ```
 
-21.Utilice el mismo ejemplo anterior solo utilice en el from la instrucción RIGHT OUTER JOIN. 
+21.Utilice el mismo ejemplo anterior solo utilice en el FROM la instrucción RIGHT OUTER JOIN. 
 
 ```sql
 SELECT
@@ -327,7 +327,7 @@ ORDER BY
     s.stor_id
 ```
 
-22.Usando base de datos Northwind . Muestre los Productos (ID del Producto, Nombre y Precio Unitario) que tengan un precio unitario igual al Máximo. 
+22.Usando base de datos Northwind . Muestre los Productos (ID del Producto, Nombre y Precio Unitario) que tengan un precio unitario igual al Máximo. Tabla products
 
 ```sql
 SELECT
