@@ -5,7 +5,7 @@ Consultas para la base de datos de Microsoft AdvertureWorks del [backup 2022](ht
 
 ## Consultas
 
-1.- Mostrar solamente el nro. de empleado (BusinessEntityID) y cargo (Title).
+1.- Mostrar solamente el nro. de empleado (BusinessEntityID) y cargo (Title). Tabla Person.Person.
 
 ```sql
 SELECT
@@ -16,7 +16,7 @@ ORDER BY
 	BusinessEntityID
 ```
 
-2.- Escribir una consulta que muestre el pago histórico de los empleados y un incremento del 20% en 3 formatos diferentes, con las siguientes cabeceras “Sin formato”, “Redondeado a 1 digito decimal”, “truncado a 1 digito”. Usar función ROUND.
+2.- Escribir una consulta que muestre el pago histórico de los empleados y un incremento del 20% en 3 formatos diferentes, con las siguientes cabeceras “Sin formato”, “Redondeado a 1 digito decimal”, “truncado a 1 digito”. Usar función ROUND. TablaHumanResources.EmployeePayHistory.
 
 ```sql
 SELECT
@@ -29,7 +29,7 @@ ORDER BY
 	BusinessEntityID
 ```
 
-3.- Listar Todos los nombres y grupos de los distintos departamentos
+3.- Listar Todos los nombres y grupos de los distintos departamentos. Tabla HumanResources.Department.
 
 ```sql
 SELECT
@@ -41,7 +41,7 @@ ORDER BY
 	GroupName
 ```
 
-4.- Listar sin repetir, todos los nombres de grupos de los departamentos. 
+4.- Listar sin repetir, todos los nombres de grupos de los departamentos. Tabla HumanResources.Department.
 
 ```sql
 SELECT DISTINCT
@@ -52,7 +52,7 @@ ORDER BY
 	GroupName
 ```
 
-5.- Crear una consulta que muestre el Nombre, numero, color, precio y tamaño de los productos que cuesten mas de $10,00
+5.- Crear una consulta que muestre el Nombre, numero, color, precio y tamaño de los productos que cuesten mas de $10,00. Tabla Production.Product.
 
 ```sql
 SELECT 
@@ -69,7 +69,7 @@ ORDER BY
 	ListPrice DESC
 ```
 
-6.- Escribir y ejecutar una sentencia SELECT que devuelva los productos cuyo número de producto comience con LJ
+6.- Escribir y ejecutar una sentencia SELECT que devuelva los productos cuyo número de producto comience con LJ Tabla Production.Product.
 
 ```sql
 SELECT 
@@ -86,7 +86,7 @@ ORDER BY
 	ProductNumber
 ```
 
-7.- Crear una consulta que muestre el número y nombre en una sola columna, separados por un guión para todos los productos de color ‘Black’.
+7.- Crear una consulta que muestre el número y nombre en una sola columna, separados por un guión para todos los productos de color ‘Black’. Tabla Production.Product.
 
 ```sql
 SELECT 
@@ -100,7 +100,7 @@ ORDER BY
 	ProductNumber
 ```
 
-8.- Crear una consulta que muestre los productos cuyos precios estén entre 10,00 y 100,00.
+8.- Crear una consulta que muestre los productos cuyos precios estén entre 10,00 y 100,00. Tabla Production.Product.
 
 ```sql
 SELECT 
@@ -215,7 +215,7 @@ ORDER BY
 	"Cantidad" DESC
 ```
 
-15.- Informar la suma total de edades, la cantidad de personas y el promedio de edad.
+15.- Informar la suma total de edades, la cantidad de personas y el promedio de edad. Tabla HumanResources.Employee.
 
 ```sql
 SELECT 
@@ -453,7 +453,7 @@ ORDER BY
 	p.Name 
 ```
 
-26.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre de la subcategoría a la que pertenecen cada uno de los productos. En la misma consulta mostrar los productos que no tienen subcategoría asignada.
+26.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre de la subcategoría a la que pertenecen cada uno de los productos. En la misma consulta mostrar los productos que no tienen subcategoría asignada. Tabla Product y ProductSubcategory.
 
 ```sql
 SELECT 
@@ -471,7 +471,7 @@ ORDER BY
 	p.Name 
 ```
 
-27.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre del modelo del producto. En la misma consulta mostrar todos los modelos que no están asignados a ningún producto.
+27.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre del modelo del producto. En la misma consulta mostrar todos los modelos que no están asignados a ningún producto. Tabla Product y ProductModel.
 
 ```sql
 SELECT 
@@ -489,7 +489,7 @@ ORDER BY
 	p.Name
 ```
 
-28.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre del modelo del producto. En la misma consulta mostrar todos los modelos que no están asignados a ningún producto y los productos que no tengan asignados ningún modelo.
+28.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre del modelo del producto. En la misma consulta mostrar todos los modelos que no están asignados a ningún producto y los productos que no tengan asignados ningún modelo. Tabla Product y ProductModel.
 
 ```sql
 SELECT 
@@ -507,7 +507,7 @@ ORDER BY
 	p.Name
 ```
 
-29.- Escriba una consulta que muestre los productos que tienen el mismo color que el producto de nombre ‘Chain’. Excluir al producto ‘Chain’ del listado.
+29.- Escriba una consulta que muestre los productos que tienen el mismo color que el producto de nombre ‘Chain’. Excluir al producto ‘Chain’ del listado. Tabla Product.
 
 ```sql
 SELECT 
@@ -528,7 +528,7 @@ ORDER BY
 	Name
 ```
 
-30.- Escriba una consulta que muestre los productos cuyo precio estén por encima del precio promedio general, ordenar el resultado por precio del producto en forma ascendente
+30.- Escriba una consulta que muestre los productos cuyo precio estén por encima del precio promedio general, ordenar el resultado por precio del producto en forma ascendente. Tabla Product.
 
 ```sql
 SELECT 
@@ -629,7 +629,7 @@ ORDER BY
 	pv.BusinessEntityID
 ```
 
-34.- Mostrar a todos los empleados que se encuentran en el departamento de manufactura y de aseguramiento de la calidad (Columna GroupName, dpto Manufacturing or QUALITY ASSURANCE, tabla DEPARTMENT)
+34.- Mostrar a todos los empleados (LastName, FirstName, Id, GroupName)que se encuentran en el departamento de Manufacturing or Quality Assurance (Columna GroupName, tablas Department, EmployeeDepartmentHistory, Person)
 
 ```sql
 SELECT 
@@ -657,7 +657,7 @@ ORDER BY
 	p.FirstName
 ```
 
-35.- Indicar el listado de los empleados del sexo masculino y que son solteros
+35.- Indicar el listado de los empleados del sexo masculino y que son solteros. Tablas Emloyee y Person
 
 ```sql
 SELECT 
@@ -679,7 +679,7 @@ ORDER BY
 	p.FirstName
 ```
 
-36.- Empleados cuyo apellido sea con la letra "S"
+36.- Empleados cuyo apellido sea con la letra "S". Tabla Person.Person
 
 ```sql
 SELECT 
@@ -695,7 +695,7 @@ ORDER BY
 	FirstName
 ```
 
-37.- Los empleados que son del estado de Florida
+37.- Los empleados que son del estado de Florida. Tablas: Person,BusinessEntity,BusinessEntityAddress,Address,StateProvince. Campos: LastName, FirstName, BusinessEntityID, StateProvinceID, nombre de la provincia. 	
 
 ```sql
 SELECT 
@@ -725,7 +725,7 @@ ORDER BY
 	FirstName
 ```
 
-38.- La suma de las ventas hechas por cada empleado, y agrupadas por año Tabla Sales.SalesPersonQuotaHistory y Person.Person
+38.- La suma de las ventas hechas por cada empleado, y agrupadas por año Tablas Sales.SalesPersonQuotaHistory y Person.Person. Campos: BusinessEntityID,LastName,FirstName, SalesQuota, QuotaDate.
 
 ```sql
 SELECT 
@@ -749,7 +749,35 @@ ORDER BY
 	YEAR(QuotaDate) DESC
 ```
 
-39.- El producto más vendido
+39.- El producto más vendido. Tabla Sales.SalesOrderDetail y Production.Product. Campos ProductID, Name, ProductSubcategoryID, OrderQty
+
+
+```sql
+WITH cte_accumulative_sales AS (
+SELECT
+	ProductID,
+	SUM(OrderQty) AS unidades_vendidas
+FROM
+	Sales.SalesOrderDetail
+GROUP BY
+	ProductID
+)
+
+SELECT	
+	p.ProductID,
+	p.Name,
+	p.ProductSubcategoryID,
+	cte_as.unidades_vendidas
+FROM
+	cte_accumulative_sales cte_as
+INNER JOIN
+	Production.Product p
+	ON p.ProductID = cte_as.ProductID
+WHERE
+	cte_as.unidades_vendidas >= ALL (SELECT unidades_vendidas
+								FROM cte_accumulative_sales)
+;
+```
 
 ```sql
 SELECT
@@ -777,7 +805,74 @@ ORDER BY
 	s.ProductID
 ```
 
-40.- El producto menos vendido
+```sql
+DECLARE @accumulative_sales INT = (
+									SELECT MAX(sum_orderqty)
+									FROM (
+										SELECT SUM(OrderQty) AS sum_orderqty 
+										FROM Sales.SalesOrderDetail 
+										GROUP BY ProductID
+										)
+								   AS subquery);
+SELECT
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID,
+	SUM(OrderQty) AS "Unidades Totales"
+	
+FROM
+	Sales.SalesOrderDetail s
+INNER JOIN
+	Production.Product p
+	ON p.ProductID = s.ProductID
+GROUP BY
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID
+HAVING
+	SUM(OrderQty) = @accumulative_sales
+ORDER BY
+	s.ProductID
+```
+
+40.- El producto menos vendido, Tabla Sales.SalesOrderDetail y Production.Product. Campos ProductID, Name, ProductSubcategoryID, OrderQty
+
+```sql
+WITH cte_accumulative_sales AS (
+SELECT
+	ProductID, 
+	SUM(OrderQty) AS sumatory_sales
+FROM
+	Sales.SalesOrderDetail
+GROUP BY
+	ProductID
+),
+
+cte_min_accumulative_sales AS (
+SELECT
+	MIN(sumatory_sales) AS min_sumatory_sales
+FROM
+	cte_accumulative_sales
+)
+
+SELECT
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID,
+	sumatory_sales
+FROM
+	cte_accumulative_sales s
+INNER JOIN
+	Production.Product p
+	ON p.ProductID = s.ProductID
+WHERE
+	sumatory_sales =  (
+						SELECT min_sumatory_sales
+						FROM cte_min_accumulative_sales
+						)
+ORDER BY
+	s.ProductID;
+```
 
 ```sql
 SELECT
@@ -804,8 +899,37 @@ HAVING
 ORDER BY
 	s.ProductID
 ```
+```sql
+DECLARE @min_sale INT = (
+						SELECT MIN(sum_qty)
+						FROM (
+							SELECT SUM(OrderQty) AS sum_qty 
+							FROM Sales.SalesOrderDetail 
+							GROUP BY ProductID
+							) sq_sum_qty
+						);
 
-41.- Listado de productos por número de ventas ordenado de mayor a menor
+SELECT
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID,
+	SUM(OrderQty) AS "Unidades Totales"	
+FROM
+	Sales.SalesOrderDetail s
+INNER JOIN
+	Production.Product p
+	ON p.ProductID = s.ProductID
+GROUP BY
+	s.ProductID,
+	p.Name,
+	p.ProductSubcategoryID
+HAVING
+	SUM(OrderQty) = @min_sale
+ORDER BY
+	s.ProductID;
+```
+
+41.- Listado de productos por número de ventas ordenado de mayor a menor. Tablas Sales.SalesOrderDetail y Production.Product. Campos ProductID, Name y OrderQty.
 
 ```sql
 SELECT
@@ -827,7 +951,7 @@ ORDER BY
 	p.Name
 ```
 
-42.- Las ventas por territorio
+42.- Las ventas por territorio. Tablas SalesOrderHeader y SalesTerritory. Campos TerritoryID, Name, SubTotal, TotalDue.
 
 ```sql
 SELECT
