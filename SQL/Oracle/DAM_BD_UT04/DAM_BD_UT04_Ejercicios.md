@@ -24,7 +24,7 @@ El campo IMPORTE ya tiene calculado la cantidad del producto x precio del produc
 
 ## Consultas
 
- 1 Número e importe total de todos los pedidos realizados en los últimos 60 días.
+ 1 Número e importe total de todos los pedidos realizados en los últimos 60 días. Tabla pedidos.
 
 ```sql
 SELECT 
@@ -79,7 +79,7 @@ BEGIN
 END;
 ```
 
- 2 Número e importe de los pedidos cuyo importe esté entre 100 y 200 €
+ 2 Número e importe de los pedidos cuyo importe esté entre 100 y 200 €. Tabla pedidos. Order by num
 
 ```sql
 SELECT 
@@ -128,7 +128,7 @@ BEGIN
 END;
 ```
 
- 3 Código y nombre de los productos ordenados ascendentemente por precio y nombre
+ 3 Código y nombre de los productos ordenados ascendentemente por precio y nombre. Tabla productos.
 
 ```sql
 SELECT 
@@ -166,7 +166,7 @@ BEGIN
 END;
 ```
 
- 4 Clientes cuyo segundo apellido sea Perez
+ 4 Clientes cuyo segundo apellido sea Perez. Tabla clientes
 
 ```sql
 SELECT 
@@ -215,7 +215,7 @@ BEGIN
 END;
 ```
 
- 5 Número total de productos que vende la empresa (en la columna debe aparecer “Nº de productos”)
+ 5 Número total de productos que vende la empresa (en la columna debe aparecer “Nº de productos”). Tabla productos.
 
 ```sql
 SELECT 
@@ -224,7 +224,7 @@ FROM
 	productos
 ```
 
- 6 Número total de productos que no han sido pedidos
+ 6 Número total de productos que no han sido pedidos. Tabla productos y lineas.
 
 
 ```sql
@@ -244,12 +244,10 @@ FROM
 LEFT JOIN lineas l
 	ON l.producto = p.codigo
 WHERE 
-	l.producto IS NULL 
-ORDER BY
-	p.codigo
+	l.producto IS NULL
 ```
 
- 7 De cada pedido, mostrar su número, importe total y datos del cliente
+ 7 De cada pedido, mostrar su número, importe total y datos del cliente. Tablas pedidos y clientes.
 
 ```sql
 SELECT 
@@ -311,7 +309,7 @@ BEGIN
 END;
 ```
 
- 8 Código, nombre del cliente y número total de pedidos que ha hecho cada cliente, ordenado de más a menos pedidos
+ 8 Código, nombre del cliente y número total de pedidos que ha hecho cada cliente, ordenado de más a menos pedidos. Tablas pedidos y clientes.
 
 La Consulta 1 incluiría esos clientes con un conteo de pedidos de 0, mientras que la Consulta 2 los excluiría debido a la combinación interna.
 
@@ -343,7 +341,28 @@ ORDER BY
 	count(p.num) DESC
 ```
 
- 9 Código, nombre del cliente y número total de pedidos que ha realizado cada cliente durante 2016
+ 9 Código, nombre del cliente y número total de pedidos que ha realizado cada cliente durante 2016. Tabla pedidos.
+ 
+```sql
+ SELECT 
+	p.cliente,
+    c.nombre,
+    c.apellidos,
+    COUNT(p.num) AS Cantidad_Pedidos
+FROM 
+	pedidos p
+INNER JOIN
+    clientes c
+    ON c.codigo = p.cliente
+WHERE
+    EXTRACT(YEAR FROM p.fecha) = 2016
+GROUP BY
+    p.cliente,
+    c.nombre,
+    c.apellidos
+ORDER BY
+	count(p.num) DESC
+```
 
 ```sql
 SELECT 
@@ -400,7 +419,7 @@ BEGIN
 END;
 ````
 
- 10 Código, nombre y número total de pedidos de los clientes que han realizado más de un pedido
+ 10 Código, nombre y número total de pedidos de los clientes que han realizado más de un pedido. Tabla clientes y pedidos
 
 ```sql
 SELECT 
