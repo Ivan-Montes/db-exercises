@@ -1,6 +1,6 @@
-# Contributing to SpringBasicBooksManagement
+# Contributing to db-exercises
 
-Thank you for considering contributing to [SpringBasicBooksManagement](https://github.com/Ivan-Montes/SpringBasicBooksManagement) We appreciate your interest and are excited to have you as part of our community. This document outlines the guidelines for contributing to this project.
+Thank you for considering contributing to [db-exercises](https://github.com/Ivan-Montes/db-exercises) We appreciate your interest and are excited to have you as part of our community. This document outlines the guidelines for contributing to this project.
 
 ## Table of Contents
 
@@ -65,4 +65,4 @@ Update the relevant sections in the project's README.md file or other documentat
 
 ## Getting Help
 If you have any questions or need assistance, feel free to reach out by creating an issue or contacting us directly through our community channels.
-Thank you for contributing to [SpringBasicBooksManagement](https://github.com/Ivan-Montes/SpringBasicBooksManagement)
+Thank you for contributing to [db-exercises](https://github.com/Ivan-Montes/db-exercises)
