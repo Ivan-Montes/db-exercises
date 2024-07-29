@@ -860,53 +860,95 @@ BEGIN
 END;
 ```
 
- 16 Datos del producto del que más unidades se han pedido
+ 16 Datos del producto del que más unidades se han pedido. Tabla productos y lineas
 
 ```sql
 SELECT
+    p.codigo,
+    p.nombre, 
+	 p.precio,
+    SUM(l.cantidad) AS unidades_vendidas   
+FROM
+    productos p
+INNER JOIN 
+    lineas l
+    ON l.producto = p.codigo
+GROUP BY
+    p.codigo,
+    p.nombre, 
+	 p.precio
+HAVING
+    SUM(l.cantidad) >= ALL (
+                            SELECT SUM(cantidad)
+                            FROM lineas
+                            GROUP BY producto
+                            )
+```
+
+```sql
+WITH CTE_SUMATORIO_VENTAS AS (
+SELECT
+    producto,
+    SUM(cantidad) AS unidades_vendidas   
+FROM
+    lineas
+GROUP BY
+    producto
+
+),
+
+CTE_MAS_VENDIDO AS (
+SELECT
+    MAX(unidades_vendidas) AS max_unidades_vendidas
+FROM
+    CTE_SUMATORIO_VENTAS
+)
+
+SELECT
+    p.codigo,
+    p.nombre, 
+	 p.precio,
+    l.unidades_vendidas
+FROM
+    productos p
+INNER JOIN 
+    CTE_SUMATORIO_VENTAS l
+    ON l.producto = p.codigo
+WHERE
+    unidades_vendidas = (
+                        SELECT max_unidades_vendidas
+                        FROM CTE_MAS_VENDIDO
+                        )
+```
+
+ 17 Datos del producto más caro del pedido 1. Tabla productos y lineas
+
+
+```sql
+WITH CTE_PRODUCTS_ORDER1 AS (
+SELECT
 	p.codigo, 
 	p.nombre, 
-	p.precio
+	p.precio,
+   RANK() OVER(ORDER BY precio desc) AS ranking
 FROM 
 	productos p
 INNER JOIN
 	lineas l
 	ON l.producto = p.codigo
-HAVING  
- 	SUM(l.CANTIDAD) >= ALL (
- 		SELECT 
- 			SUM(l2.CANTIDAD)
- 		FROM
- 			lineas l2
- 		GROUP BY
- 			l2.producto
- 	)
-GROUP BY
-	p.codigo, 
-	p.nombre, 
-	p.precio
-```
+WHERE
+    l.num_pedido = 1
+)
 
-```sql
 SELECT
-	p.codigo, 
-	p.nombre, 
-	p.precio
+	codigo, 
+	nombre, 
+	precio
 FROM 
-	productos p
-INNER JOIN
-	lineas l
-	ON l.PRODUCTO = p.codigo
-GROUP BY
-	p.codigo, 
-	p.nombre, 
-	p.precio
-ORDER BY 
-	SUM(CANTIDAD) DESC
-FETCH FIRST ROW ONLY
+	CTE_PRODUCTS_ORDER1 
+WHERE
+    ranking = 1
 ```
-
- 17 Datos del producto más caro del pedido 1
 
 ```sql
 SELECT
@@ -924,11 +966,12 @@ WHERE
 			(		
 			SELECT
 				l2.importe / l2.cantidad
-			FRO
+			FROM
 				lineas l2
 			WHERE
 				l2.NUM_PEDIDO = 1)
 ```
+
 ```
 DECLARE
 
@@ -974,7 +1017,7 @@ BEGIN
 END;
 ```
 
- 18 Datos del producto más caro de cada pedido (con una consulta correlacionada)
+ 18 Datos del producto más caro de cada pedido (con una consulta correlacionada). Tabla productos y lineas
 
 ```sql
 SELECT
@@ -1050,7 +1093,7 @@ BEGIN
 END;
 ```
  
- 19 Código de cada cliente y cantidad total que se ha gastado en 2016
+ 19 Código de cada cliente y cantidad total que se ha gastado en 2016. Tabla pedidos
 
 ```sql
 SELECT
@@ -1113,8 +1156,31 @@ BEGIN
 END;
  ```
  
- 20 Cantidad total gastada y código de cliente de los que menos han gastado en 2016
+ 20 Cantidad total gastada y código de cliente de los que menos han gastado en 2016. Tabla pedidos
 
+```sql
+WITH CTE_SUMATORY_BY_CLIENTS AS (
+SELECT
+	p.cliente,
+	sum(p.total) AS Total_SUMADO,
+    RANK() OVER(ORDER BY sum(p.total) ) AS RANKING
+FROM 
+	pedidos p
+WHERE 
+	EXTRACT(YEAR FROM p.FECHA) = 2016
+GROUP BY 
+	p.cliente
+)
+
+SELECT
+	cliente,
+    total_sumado
+FROM 
+	CTE_SUMATORY_BY_CLIENTS CTE
+WHERE
+    RANKING = 1
+```
+ 
 ```sql
 SELECT 
 	p.cliente AS "Cod",
