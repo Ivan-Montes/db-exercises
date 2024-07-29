@@ -482,7 +482,7 @@ BEGIN
 END;
 ```
 
- 11 Para cada pedido mostrar su número, código del cliente y nº total de líneas que tiene
+ 11 Para cada pedido mostrar su número, código del cliente y nº total de líneas que tiene. Tabla pedidos y lineas.
 
 Ambas consultas están diseñadas para producir los mismos resultados, pueden haber diferencias si hay pedidos sin líneas. La Consulta 1 incluiría esos pedidos con un conteo de líneas de 0, mientras que la Consulta 2 los excluiría debido a la combinación interna
 
@@ -516,7 +516,23 @@ ORDER BY
 	p.num
 ```
 
- 12 Código de cliente, nombre de producto y cantidad total que ha pedido cada cliente de cada producto
+ 12 Código de cliente, nombre de producto y cantidad total que ha pedido cada cliente de cada producto. Tabla productos, pedidos y lineas.
+
+```sql
+SELECT DISTINCT
+    p.cliente,
+    pr.nombre,
+    SUM(l.cantidad) OVER (PARTITION BY p.cliente, pr.nombre) AS "Cantidad"
+FROM
+    pedidos p
+INNER JOIN 
+    lineas l ON l.num_pedido = p.num
+INNER JOIN 
+    productos pr ON pr.codigo = l.producto
+ORDER BY 
+    p.cliente,
+    "Cantidad" DESC
+```
 
 ```sql
 SELECT 
@@ -595,7 +611,7 @@ BEGIN
 END;
 ```
 
- 13 Para cada cliente mostrar su código, nombre , numero e importe total de cada uno de sus pedidos
+ 13 Para cada cliente mostrar su código, nombre , numero e importe total de cada uno de sus pedidos. Tabla pedidos y clientes.
 
 ```sql
 SELECT 
@@ -666,8 +682,7 @@ BEGIN
 	dbms_output.put_line(rpad('#',5,'#'));
 END;
 ```
- 14 Para cada cliente menor de edad mostrar su código y nombre, el importe total más alto, el más 
-bajo de los pedidos que ha realizado
+ 14 Para cada cliente menor de edad mostrar su código y nombre, el importe total más alto, el más bajo de los pedidos que ha realizado. Tablas clientes y pedidos
 
 ```sql
 SELECT 
@@ -752,7 +767,24 @@ END;
  15 Mostrar el código del producto, el nº de veces que ha sido pedido y la cantidad total de unidades 
 que se han pedido (los que no hayan sido pedidos también deben ser mostrados con estos valores a 
 0) (combinación externa)
-
+	
+```sql
+ SELECT DISTINCT
+    p.codigo,
+    count(l.producto) OVER(PARTITION BY p.codigo) as veces_pedido,
+    CASE 
+        WHEN SUM(l.cantidad) OVER(PARTITION BY p.codigo) IS NULL THEN 0
+        ELSE SUM(l.cantidad) OVER(PARTITION BY p.codigo)
+    END as cantidad_pedida
+FROM
+	productos p
+LEFT JOIN
+	lineas l
+	ON l.producto = p.codigo
+ORDER BY 
+	veces_pedido DESC
+``` 
+	
 ```sql
 SELECT 
 	p.codigo,
