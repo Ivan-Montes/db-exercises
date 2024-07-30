@@ -1414,7 +1414,7 @@ BEGIN
 END;
 ```
 
- 23 Datos del pedido más caro y del más barato
+ 23 Datos del pedido más caro y del más barato. Tabla pedidos.
 
 ```sql
 SELECT 
@@ -1552,28 +1552,24 @@ INNER JOIN
 WHERE
 	pp.nombre LIKE 'PANTALÓN'
 ```
+
  28 Para cada cliente, mostrar los datos del pedido cuyo importe sea superior al importe medio de sus pedidos
 
 ```sql
 SELECT 
-	p.num,
-	CASE 
-	WHEN p.gastos_envio IS NULL 
-		THEN 0
-		ELSE p.gastos_envio
-	END AS "Gº Envío",
+	p.num,	
 	p.total,
 	p.cliente
 FROM
 	pedidos p
 WHERE 
-	p.total > ALL(
+	p.total >= ALL(
 		SELECT 
 			AVG(p2.total)
 		FROM
 			pedidos p2
 		WHERE 
-			p.cliente = p2.cliente
+			p2.cliente = p.cliente
 			)
 ```
 
@@ -1593,19 +1589,18 @@ DECLARE
 	CURSOR c_pedidos IS
 			SELECT 
 				p.num,
-				p.gastos_envio,
 				p.total,
 				p.cliente
 			FROM
 				pedidos p
 			WHERE 
-				p.total > ALL(
+				p.total >= ALL(
 					SELECT 
 						AVG(p2.total)
 					FROM
 						pedidos p2
 					WHERE 
-						p.cliente = p2.cliente
+						p2.cliente = p.cliente
 				);							
 	
 	r_pedidos t_pedidos;
@@ -1615,7 +1610,6 @@ BEGIN
 	dbms_output.put_line(rpad('-',40,'-'));
 	dbms_output.put_line(
 			rpad('Num', 10) ||
-			rpad('Gº Envio', 10) ||
 			rpad('Total', 10)  ||
 			lpad('Cliente', 10)  
 		);
@@ -1624,13 +1618,8 @@ BEGIN
 	LOOP
 		FETCH c_pedidos INTO r_pedidos;
 		EXIT WHEN c_pedidos%notfound;
-				IF r_pedidos.l_gastos_envio IS null
-					THEN l_gastos_envio_check := 0;
-					ELSE l_gastos_envio_check := r_pedidos.l_gastos_envio;
-				END if;
 				dbms_output.put_line(
 					rpad(r_pedidos.l_num, 10) ||
-					rpad(l_gastos_envio_check, 10) ||		
 					rpad(r_pedidos.l_total, 10) ||
 					lpad(r_pedidos.l_cliente, 10) 
 				);
@@ -1641,7 +1630,7 @@ BEGIN
 END;
 ```
 
- 29 Lista de todos los pedidos con mostrando también los días previstos de espera para el envío
+ 29 Lista de todos los pedidos con mostrando también los días previstos de espera para el envío. Tabla pedidos.
 
 ```sql
 SELECT
@@ -1693,7 +1682,32 @@ BEGIN
 END;
 ```
 
- 30 Pedidos con el mínimo nº de días previsto de espera
+ 30 Pedidos con el mínimo nº de días previsto de espera Tabla pedidos.
+
+```sql
+WITH CTE_LIST_DIAS_PREVISTOS AS (
+SELECT    
+    num,
+    fecha,
+    fecha_prevista,
+    fecha_prevista - fecha AS cuenta_dias,
+    RANK() OVER(ORDER BY fecha_prevista - fecha ASC) as ranking
+FROM 
+    pedidos
+)
+
+SELECT
+    num,
+    fecha,
+    fecha_prevista,
+    cuenta_dias
+FROM
+    CTE_LIST_DIAS_PREVISTOS
+WHERE 
+    ranking = 1
+ORDER BY
+	num 
+```
 
 ```sql
 SELECT 
