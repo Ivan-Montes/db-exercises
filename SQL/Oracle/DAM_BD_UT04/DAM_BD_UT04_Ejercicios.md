@@ -13,15 +13,40 @@ el resto de atributos de las entidades):
 ![DAM_BD_UT04_MER](./images/DAM_BD_UT04_MER.JPG "Database MER")
 
 
-### ACLARACIONES
+#### ACLARACIONES
 
-En la tabla PEDIDOS el atributo TOTAL es el IMPORTE_TOTAL del pedido pero sin GASTOS DE ENVIO
+- En la tabla PEDIDOS el atributo TOTAL es el IMPORTE_TOTAL del pedido pero sin GASTOS DE ENVIO
 
-Tabla Lineas: 
-El campo IMPORTE ya tiene calculado la cantidad del producto x precio del producto La columna NUM es el numero de la linea de ese producto en la factura
+- En la tabla Lineas, el campo IMPORTE ya tiene calculado la cantidad del producto x precio del producto La columna NUM es el numero de la linea de ese producto en la factura
+ 
+## Uso
+     
+- Lanzar desde dentro de la carpeta DAM_BD_UT04:
 
----
+```bash
+docker run -d --name oracle-sql-dam \
+-p 1521:1521 -p 5500:5500 \
+-e ORACLE_PWD=12345 \
+-v oracle-sql-dam-vol:/opt/oracle/oradata \
+-v .:/opt/oracle/scripts/startup \
+container-registry.oracle.com/database/express:21.3.0-xe
+```
 
+- Parar o arrancar el contenedor previamente creado
+
+```bash
+docker stop oracle-sql-exp
+docker start oracle-sql-exp
+```
+    
+- Datos de conexión
+
+> host: localhost
+> database: xe
+> user: sys
+> role: sysdba
+> password: 12345
+   
 ## Consultas
 
  1 Número e importe total de todos los pedidos realizados en los últimos 60 días. Tabla pedidos.
@@ -315,15 +340,13 @@ La Consulta 1 incluiría esos clientes con un conteo de pedidos de 0, mientras q
 
 ```sql
 SELECT 
-	p.CLIENTE,
-	(SELECT c.nombre || ' ' || c.apellidos FROM clientes c WHERE c.codigo = p.cliente) AS "Datos Cliente",
-	count(p.num) AS "Pedidos"
+	c.codigo AS "Codigo de cliente",
+	c.nombre AS "Nombre",
+	(SELECT COUNT(num) FROM PEDIDOS WHERE cliente = c.CODIGO) AS "Nº de pedidos"
 FROM
-	pedidos p
-GROUP BY
-	p.cliente
+	clientes c 
 ORDER BY
-	count(p.num) DESC
+	"Nº de pedidos" DESC
 ```
 
 ```sql
@@ -1250,28 +1273,20 @@ BEGIN
 END;
 ```
 
- 21 Para cada cliente mostrar su código y la suma total del importe de sus pedidos y gastos de envÍo
+ 21 Para cada cliente mostrar su código y la suma total del importe de sus pedidos y gastos de envío
 
 ```sql
-SELECT 
-	p.cliente AS "Cod",
-	CASE
-		WHEN sum(p.total) IS NULL AND sum(p.gastos_envio) IS NULL
-			THEN 0
-		WHEN sum(p.gastos_envio) IS NULL
-			THEN sum(p.total)
-		ELSE 
-			sum(p.total) + sum(p.gastos_envio)
-	END AS "Sumatorio"
-	
-FROM
+SELECT  
+	C.CODIGO, 
+    COALESCE(SUM(p.total), 0) + COALESCE(SUM(p.gastos_envio), 0) AS "Sumatorio"
+FROM 
 	pedidos p
-	
-GROUP BY
-	p.cliente 
-	
+RIGHT JOIN clientes c
+	ON C.CODIGO = P.CLIENTE 
+GROUP BY 
+	C.CODIGO	
 ORDER BY
-	"Sumatorio" DESC 
+	"Sumatorio" DESC  
 ```
 
 ```
@@ -1284,25 +1299,17 @@ DECLARE
 	);
 
 	CURSOR c_productos IS
-		SELECT 
-			p.cliente AS "Cod",
-			CASE
-				WHEN sum(p.total) IS NULL AND sum(p.gastos_envio) IS NULL
-					THEN 0
-				WHEN sum(p.gastos_envio) IS NULL
-					THEN sum(p.total)
-				ELSE 
-					sum(p.total) + sum(p.gastos_envio)
-			END AS "Sumatorio"
-			
-		FROM
-			pedidos p
-			
-		GROUP BY
-			p.cliente 
-			
-		ORDER BY
-			"Sumatorio" DESC; 
+		SELECT  
+	    C.CODIGO, 
+            COALESCE(SUM(p.total), 0) + COALESCE(SUM(p.gastos_envio), 0) AS "Sumatorio"
+        FROM 
+	        pedidos p
+        RIGHT JOIN clientes c
+	        ON C.CODIGO = P.CLIENTE 
+        GROUP BY 
+	        C.CODIGO	
+        ORDER BY
+	        "Sumatorio" DESC; 
 		
 	r_productos t_productos;
 
@@ -1329,28 +1336,20 @@ BEGIN
 END;
 ```
 
- 22 Número de pedido , importe total y cliente de los pedidos que no tienen gastos de envío (debe aparecer un 0 en la columna de gastos de envío y pon una etiqueta a ese campo)
+ 22 Número de pedido, importe total y cliente de los pedidos que no tienen gastos de envío. Añadir la columna de gastos de envío (debe aparecer un 0) con una etiqueta en ese campo
 
 ```sql
-SELECT 
+SELECT  
 	p.num AS "Pedido",
 	p.total,
-	p.cliente AS "Cliente",
-	CASE
-		WHEN p.gastos_envio IS NULL
-			THEN 0
-		ELSE 
-			p.gastos_envio
-	END AS "Gº Envío"
-	
-FROM
+	p.cliente AS "Cliente",	
+	COALESCE(p.gastos_envio, 0) AS "Gº de Envío"	
+FROM 
 	pedidos p
-
-WHERE
+WHERE 
 	p.gastos_envio IS NULL OR p.gastos_envio = 0
-	
 ORDER BY
-	"Pedido"
+	p.total DESC  
 ```
 
 ```
@@ -1365,25 +1364,17 @@ DECLARE
 	);
 
 	CURSOR c_pedidos IS
-		SELECT 
-			p.num AS "Pedido",
-			p.total,
-			p.cliente AS "Cliente",
-			CASE
-				WHEN p.gastos_envio IS NULL
-					THEN 0
-				ELSE 
-					p.gastos_envio
-			END AS "Gº Envío"
-			
-		FROM
-			pedidos p
-		
-		WHERE
-			p.gastos_envio IS NULL OR p.gastos_envio = 0
-			
-		ORDER BY
-			"Pedido"; 
+        SELECT  
+	        p.num AS "Pedido",
+	        p.total,
+	        p.cliente AS "Cliente",	
+	        COALESCE(p.gastos_envio, 0) AS "Gº de Envío"	
+        FROM 
+	        pedidos p
+        WHERE 
+	        p.gastos_envio IS NULL OR p.gastos_envio = 0
+        ORDER BY
+	        p.total DESC; 
 		
 	r_pedidos t_pedidos;
 
@@ -1440,33 +1431,28 @@ WHERE
 ```
 
 ```sql
+WITH CTE_MAX_TOTAL AS (
+	SELECT	
+		MAX(total) AS "Max_Total"		
+	FROM
+		pedidos
+),
+CTE_MIN_TOTAL AS(
+	SELECT	
+		MIN(total) AS "Min_Total"		
+	FROM
+		pedidos
+)
 SELECT 
 	p.*	
 FROM
 	pedidos p 
 WHERE 
-	p.total =  
-		(
-		SELECT	
-			max(pp.total) AS "Total"		
-		FROM
-			pedidos pp
-		)
-		
-	UNION
-	
-SELECT 
-	p.*	
-FROM
-	pedidos p 
-WHERE 
-	p.total =  
-		(
-		SELECT	
-			min(pp.total) AS "Total"		
-		FROM
-			pedidos pp
-		)
+	p.total = (SELECT "Max_Total"
+		FROM CTE_MAX_TOTAL)
+	OR
+	p.total = (SELECT "Min_Total"
+		FROM CTE_MIN_TOTAL)
 ```
  
  24 Sentencia que muestre los productos con este formato 
