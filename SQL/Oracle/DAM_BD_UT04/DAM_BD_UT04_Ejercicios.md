@@ -41,11 +41,14 @@ docker start oracle-sql-exp
     
 - Datos de conexión
 
-    host: localhost
-    database: xe
-    user: sys
-    role: sysdba
-    password: 12345
+```
+host: localhost
+database: xe
+user: sys
+role: sysdba
+password: 12345
+```
+
    
 ## Consultas
 
