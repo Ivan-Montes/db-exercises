@@ -41,11 +41,11 @@ docker start oracle-sql-exp
     
 - Datos de conexión
 
-> host: localhost
-> database: xe
-> user: sys
-> role: sysdba
-> password: 12345
+    host: localhost
+    database: xe
+    user: sys
+    role: sysdba
+    password: 12345
    
 ## Consultas
 
@@ -513,10 +513,10 @@ Ambas consultas están diseñadas para producir los mismos resultados, pueden ha
 SELECT 
 	p.num,
 	p.cliente,
-	(	SELECT count(num_pedido)
-		FROM lineas l
-		WHERE l.num_pedido = p.num
-		) AS "Nº Lineas"
+	(SELECT count(num_pedido)
+	FROM lineas l
+	WHERE l.num_pedido = p.num
+	) AS "Nº Lineas"
 FROM
 	pedidos p
 ORDER BY
@@ -919,14 +919,12 @@ GROUP BY
     producto
 
 ),
-
 CTE_MAS_VENDIDO AS (
 SELECT
     MAX(unidades_vendidas) AS max_unidades_vendidas
 FROM
     CTE_SUMATORIO_VENTAS
 )
-
 SELECT
     p.codigo,
     p.nombre, 
@@ -962,7 +960,6 @@ INNER JOIN
 WHERE
     l.num_pedido = 1
 )
-
 SELECT
 	codigo, 
 	nombre, 
@@ -1000,23 +997,23 @@ DECLARE
 
 	CURSOR c_productos IS
 	SELECT
-			p.codigo, 
-			p.nombre, 
-			p.precio
-		FROM 
-			productos p
-		INNER JOIN
-			lineas l
-			ON l.producto = p.codigo
-		WHERE 
-			l.NUM_PEDIDO = 1 AND 
-			p.PRECIO  >= ALL (	
-					SELECT 
-						l2.importe / l2.cantidad
-					FROM
-						lineas l2
-					WHERE 
-						l2.NUM_PEDIDO = 1);
+		p.codigo, 
+		p.nombre, 
+		p.precio
+	FROM 
+		productos p
+	INNER JOIN
+		lineas l
+		ON l.producto = p.codigo
+	WHERE 
+		l.NUM_PEDIDO = 1 AND 
+		p.PRECIO  >= ALL (	
+				SELECT 
+					l2.importe / l2.cantidad
+				FROM
+					lineas l2
+				WHERE 
+					l2.NUM_PEDIDO = 1);
 						
 BEGIN
 	dbms_output.put_line(rpad('#',5,'#'));
@@ -1071,26 +1068,26 @@ DECLARE
 
 	CURSOR c_productos IS
 	SELECT
-			p.codigo, 
-			p.nombre, 
-			p.precio,
-			l.num_pedido
-		FROM 
-			productos p
-		INNER JOIN
-			lineas l
-			ON l.producto = p.codigo
-		WHERE 
-			p.precio >= ALL (
-					SELECT 
-						l2.importe / l2.cantidad
-					FROM
-						lineas l2
-					WHERE 
-						l2.num_pedido = l.num_pedido 
-					)
-		ORDER BY
-			l.num_pedido DESC ;
+		p.codigo, 
+		p.nombre, 
+		p.precio,
+		l.num_pedido
+	FROM 
+		productos p
+	INNER JOIN
+		lineas l
+		ON l.producto = p.codigo
+	WHERE 
+		p.precio >= ALL (
+				SELECT 
+					l2.importe / l2.cantidad
+				FROM
+					lineas l2
+				WHERE 
+					l2.num_pedido = l.num_pedido 
+				)
+	ORDER BY
+		l.num_pedido DESC;
 						
 BEGIN
 	dbms_output.put_line(rpad('#',5,'#'));
@@ -1143,8 +1140,8 @@ ORDER BY
 
 	CURSOR c_productos IS
 		SELECT
-		p.cliente AS "Cod" ,
-		sum(p.total) AS "Total"
+			p.cliente AS "Cod" ,
+			sum(p.total) AS "Total"
 		FROM 
 			pedidos p
 		WHERE 
@@ -1152,7 +1149,7 @@ ORDER BY
 		GROUP BY 
 			p.cliente
 		ORDER BY
-			sum(p.total) DESC ;
+			sum(p.total) DESC;
 		
 	r_productos t_productos;
 
@@ -1186,7 +1183,7 @@ WITH CTE_SUMATORY_BY_CLIENTS AS (
 SELECT
 	p.cliente,
 	sum(p.total) AS Total_SUMADO,
-    RANK() OVER(ORDER BY sum(p.total) ) AS RANKING
+	RANK() OVER(ORDER BY sum(p.total) ) AS RANKING
 FROM 
 	pedidos p
 WHERE 
@@ -1194,10 +1191,9 @@ WHERE
 GROUP BY 
 	p.cliente
 )
-
 SELECT
 	cliente,
-    total_sumado
+	total_sumado
 FROM 
 	CTE_SUMATORY_BY_CLIENTS CTE
 WHERE
@@ -1276,9 +1272,9 @@ END;
  21 Para cada cliente mostrar su código y la suma total del importe de sus pedidos y gastos de envío
 
 ```sql
-SELECT  
-	C.CODIGO, 
-    COALESCE(SUM(p.total), 0) + COALESCE(SUM(p.gastos_envio), 0) AS "Sumatorio"
+SELECT
+	C.CODIGO,
+	COALESCE(SUM(p.total), 0) + COALESCE(SUM(p.gastos_envio), 0) AS "Sumatorio"
 FROM 
 	pedidos p
 RIGHT JOIN clientes c
@@ -1299,9 +1295,9 @@ DECLARE
 	);
 
 	CURSOR c_productos IS
-		SELECT  
-	    C.CODIGO, 
-            COALESCE(SUM(p.total), 0) + COALESCE(SUM(p.gastos_envio), 0) AS "Sumatorio"
+		SELECT
+			C.CODIGO,
+			COALESCE(SUM(p.total), 0) + COALESCE(SUM(p.gastos_envio), 0) AS "Sumatorio"
         FROM 
 	        pedidos p
         RIGHT JOIN clientes c
@@ -1681,7 +1677,6 @@ SELECT
 FROM 
     pedidos
 )
-
 SELECT
     num,
     fecha,
@@ -1698,17 +1693,15 @@ ORDER BY
 ```sql
 SELECT 
 	num,
-	( fecha_prevista - fecha ) AS "Días"
+	(fecha_prevista - fecha) AS "Días"
 FROM
 	pedidos
 WHERE 
-	( fecha_prevista - fecha ) <= ALL
-			(
-				SELECT 
-					(p1.fecha_prevista - p1.fecha)
-				FROM 
-					PEDIDOS p1
-	)
+	(fecha_prevista - fecha) <= ALL
+		(
+			SELECT (p1.fecha_prevista - p1.fecha)
+			FROM PEDIDOS p1
+		)
 ORDER BY
 	num 
 ```
@@ -1716,21 +1709,19 @@ ORDER BY
 ```
 DECLARE 
     CURSOR c_pedidos IS
-        SELECT 
-			num,
-			( fecha_prevista - fecha ) AS "DIAS"
+    	SELECT
+    		num,
+    		(fecha_prevista - fecha) AS "DIAS"
 		FROM
 			pedidos
 		WHERE 
-			( fecha_prevista - fecha ) <= ALL
-					(
-						SELECT
-							(p1.fecha_prevista - p1.fecha 
-						FROM 
-							PEDIDOS p1
-					)
+			(fecha_prevista - fecha) <= ALL
+				(
+					SELECT (p1.fecha_prevista - p1.fecha 
+					FROM PEDIDOS p1
+				)
 		ORDER BY
-			num  ;
+			num;
 BEGIN	
 	dbms_output.put_line(rpad('#',5,'#'));
 	dbms_output.put_line(rpad('-',20,'-'));
