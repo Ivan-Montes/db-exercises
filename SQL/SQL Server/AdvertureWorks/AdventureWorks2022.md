@@ -16,7 +16,7 @@ ORDER BY
 	BusinessEntityID
 ```
 
-2.- Escribir una consulta que muestre el pago histórico de los empleados y un incremento del 20% en 3 formatos diferentes, con las siguientes cabeceras “Sin formato”, “Redondeado a 1 digito decimal”, “truncado a 1 digito”. Usar función ROUND. TablaHumanResources.EmployeePayHistory.
+2.- Escribir una consulta que muestre el pago histórico de los empleados y un incremento del 20% en 3 formatos diferentes, con las siguientes cabeceras “Sin formato”, “Redondeado a 1 digito decimal”, “truncado a 1 digito”. Usar función ROUND. Tabla HumanResources.EmployeePayHistory.
 
 ```sql
 SELECT
@@ -146,10 +146,8 @@ FROM
 	Production.Product
 WHERE
 	ProductSubcategoryID = 1 OR ProductSubcategoryID = 2 
-GROUP BY
-	ProductSubcategoryID,
-	Name
 ORDER BY
+	ProductSubcategoryID,
 	Name
 ```
 
@@ -163,12 +161,12 @@ SELECT
 FROM
 	HumanResources.Employee
 WHERE
-	SUBSTRING(LoginID,17,1) LIKE 'k%'
+	SUBSTRING(LoginID,17,1) LIKE 'k'
 ORDER BY
 	LoginID
 ```
 
-12.- Crear una consulta para mostrar los 10 empleados con mayor cantidad de horas de vacaciones. Utilizar la tabla: HumanResources.Employee y columnas: LoginID, Title, VacationHours
+12.- Crear una consulta para mostrar los 10 empleados con mayor cantidad de horas de vacaciones. Utilizar la tabla: HumanResources.Employee y columnas: LoginID, JobTitle, VacationHours
 
 ```sql
 SELECT TOP 10
@@ -182,7 +180,7 @@ ORDER BY
 	JobTitle
 ```
 
-13.- Crear una consulta que permita calcular un incremento de 15% para los que tienen menos de 50 hs. De vacaciones, 10% para los que tienen entre 50 y 70 hs. De vacaciones y un 5 % para el resto. Utilizar la tabla: HumanResources.Employee y columna: VacationHours
+13.- Crear una consulta que permita calcular un incremento de 15% para los que tienen menos de 50 hs. De vacaciones, 10% para los que tienen entre 50 y 70 hs. De vacaciones y un 5 % para el resto. Utilizar la tabla: HumanResources.Employee
 
 ```sql
 SELECT
@@ -219,25 +217,25 @@ ORDER BY
 
 ```sql
 SELECT 
+	SUM(DATEDIFF(YEAR, BirthDate, SYSDATETIME())) AS "Suma de edades",
 	COUNT(BusinessEntityID) AS "Cantidad Personas",
-	AVG(DATEDIFF(YEAR, BirthDate, CONVERT(DATE, GETDATE()))) AS "Media de edad",
-	SUM(DATEDIFF(YEAR, BirthDate, CONVERT(DATE, GETDATE()))) AS "Suma de edades"
+	AVG(DATEDIFF(YEAR, BirthDate, CONVERT(DATE, GETDATE()))) AS "Promedio de edad"	
 FROM
 	HumanResources.Employee
 ```
 
-16.- Mostrar la cantidad total de productos, el peso total de los productos y el peso promedio de cada uno de ellos. Colocar etiquetas representativas en las columnas.
+16.- Mostrar la cantidad total de productos, el peso total de los productos y el peso promedio. Coloca etiquetas representativas en las columnas. Tabla Production.Product
 
 ```sql
-SELECT 
-	COUNT(ProductId) AS "Cantidad de Productos",
-	CAST(ROUND(AVG(Weight),2) AS NUMERIC(12,2)) AS "Peso Medio de los Productos",
-	SUM(Weight) AS "Peso Total de los Productos"
+SELECT
+	COUNT(ProductID)AS "Cantidad total de productos",
+	SUM(Weight) AS "Peso total de los productos",
+	ROUND(AVG(Weight),2) AS "Peso promedio"
 FROM
 	Production.Product
 ```
 
-17.- Mostrar la cantidad total de productos por subcategoría. Utilizar la tabla: Production.Product y la columna: ProductSubcategoryID
+17.- Mostrar la cantidad total de productos por subcategoría. Utilizar la tabla: Production.Product
 
 ```sql
 SELECT 
@@ -251,39 +249,32 @@ ORDER BY
 	"Cantidad de Productos" DESC
 ```
 
-18.- Mostrar el monto del producto de mayor costo para cada subcategoría, excluir los productos cuya subcategoría sea nula. Utilizar la tabla: Production.Product y la columna ProductSubcategory
+18.- Mostrar el monto del producto de mayor costo para cada subcategoría, excluir los productos cuya subcategoría sea nula. Utilizar la tabla: Production.Product 
 
 ```sql
 SELECT 
-	p.ProductSubcategoryID AS Subcategoria_ID,
-	MAX(p.listprice) AS Precio_Mayor
+	MAX(StandardCost) AS "Mayor Costo",
+	ProductSubcategoryID AS Subcategoria_ID
 FROM
-	Production.Product p
-WHERE
-	p.ProductSubcategoryID IS NOT NULL
-GROUP BY
-	p.ProductSubcategoryID
-```
-
-```sql
-SELECT 
-	ProductSubcategoryID AS "Subcategoría",
-	ListPrice
-FROM
-	Production.Product p
+	Production.Product
 WHERE
 	ProductSubcategoryID IS NOT NULL
 GROUP BY
-	ProductSubcategoryID,
-	ListPrice
-HAVING
-	 ListPrice >= ALL (
-			SELECT pp.ListPrice
-			FROM Production.Product pp
-			WHERE pp.ProductSubcategoryID = p.ProductSubcategoryID
-			)
+	ProductSubcategoryID	
 ORDER BY
-	ProductSubcategoryID
+	1 DESC 
+```
+
+```sql
+SELECT DISTINCT 
+	MAX(StandardCost) OVER(PARTITION BY ProductSubcategoryID) AS "Mayor Costo",
+	ProductSubcategoryID AS Subcategoria_ID	
+FROM
+	Production.Product
+WHERE 
+	ProductSubcategoryID IS NOT NULL
+ORDER BY
+	1 DESC 
 ```
 
 19.- Mostrar la cantidad total de unidades de medidas diferentes utilizadas en la tabla Productos.
@@ -481,12 +472,10 @@ SELECT
 	pm.Name AS "Nombre Modelo"
 FROM
 	Production.Product p
-RIGHT JOIN
-	Production.ProductModel pm
+RIGHT JOIN Production.ProductModel pm
 	ON pm.ProductModelID = p.ProductModelID
 ORDER BY
-	p.ProductID,
-	p.Name
+	pm.ProductModelID
 ```
 
 28.- Escribir una consulta para visualizar número y nombre del producto, el número y el nombre del modelo del producto. En la misma consulta mostrar todos los modelos que no están asignados a ningún producto y los productos que no tengan asignados ningún modelo. Tabla Product y ProductModel.
@@ -532,22 +521,22 @@ ORDER BY
 
 ```sql
 SELECT 
-	p.ProductID,
-	p.Name AS "Nombre Producto",
-	p.ListPrice AS "Precio"
+	ProductID,
+	Name AS "Nombre Producto",
+	ListPrice AS "Precio"
 FROM
-	Production.Product p
+	Production.Product
 WHERE
-	ListPrice > ALL (
-			SELECT AVG(pp.ListPrice)
-			FROM Production.Product pp
+	ListPrice > (
+			SELECT AVG(ListPrice)
+			FROM Production.Product
 			)
 ORDER BY
-	p.ListPrice,
-	p.Name
+	ListPrice,
+	Name
 ```
 
-31.- Utilizando Subconsultas, Escriba una consulta que muestre los productos que pertenecen a la misma categoría a la que pertenece el producto “Road-150 Red, 62”.
+31.- Utilizando solo Subconsultas, Escriba una consulta que muestre los productos que pertenecen a la misma categoría a la que pertenece el producto “Road-150 Red, 62”.
 
 ```sql
 SELECT 
@@ -585,26 +574,21 @@ ORDER BY
 32.- Mostrar todos los productos que hayan tenido ventas en el año 2013. Utilizar las tablas: Production.Product y Production.TransactionHistory Columna: TransactionDate
 
 ```sql
-SELECT
+SELECT DISTINCT 
 	p.ProductID,
 	p.Name AS "Nombre Producto",
 	YEAR(t.TransactionDate) AS "Año"
-FROM
+FROM 
 	Production.Product p
-INNER JOIN
-	Production.TransactionHistory t
-	ON t.ProductID = p.ProductID
+INNER JOIN Production.TransactionHistory t
+	ON t.ProductID = p.ProductID 
 WHERE
-	YEAR(t.TransactionDate) = 2013
-GROUP BY
-	p.ProductID,
-	p.Name,
-	YEAR(t.TransactionDate)
+	YEAR(TransactionDate) = 2013
 ORDER BY
 	p.ProductID
 ```
 
-33.- Mostrar el nombre de los vendedores que hayan vendido al menos una unidad del o de los producto/s con menor precio. Utilizar las tablas: Purchasing.ProductVendor, Purchasing.Vendor, Production.Product (ListPrice)
+33.- Mostrar el nombre de los vendedores que hayan vendido al menos una unidad del o de los producto/s con menor precio(que no sea 0). Tablas: Purchasing.ProductVendor, Purchasing.Vendor, Production.Product (ListPrice)
 
 ```sql
 SELECT
@@ -629,7 +613,7 @@ ORDER BY
 	pv.BusinessEntityID
 ```
 
-34.- Mostrar a todos los empleados (LastName, FirstName, Id, GroupName)que se encuentran en el departamento de Manufacturing or Quality Assurance (Columna GroupName, tablas Department, EmployeeDepartmentHistory, Person)
+34.- Mostrar a todos los empleados (LastName, FirstName, BusinessEntityID, GroupName)que se encuentran en el departamento de Manufacturing or Quality Assurance (Columna GroupName, tablas Person.Person, HumanResources.EmployeeDepartmentHistory, HumanResources.Department)
 
 ```sql
 SELECT 
@@ -638,23 +622,45 @@ SELECT
 	p.BusinessEntityID,
 	d.Name AS "Departamento",
 	d.GroupName AS "Grupo Departamental"
-FROM
-	HumanResources.Department d
-INNER JOIN
-	HumanResources.EmployeeDepartmentHistory ed
-	ON ed.DepartmentID = d.DepartmentID
-INNER JOIN
-	HumanResources.Employee e
-	ON e.BusinessEntityID = ed.BusinessEntityID
-INNER JOIN
+FROM 
 	Person.Person p
-	ON p.BusinessEntityID = e.BusinessEntityID
+INNER JOIN HumanResources.EmployeeDepartmentHistory e
+	ON e.BusinessEntityID = p.BusinessEntityID and e.EndDate is NULL 
+INNER JOIN HumanResources.Department d
+	ON d.DepartmentID = e.DepartmentID 
 WHERE
-	d.GroupName LIKE 'manufacturing' OR
-	d.GroupName LIKE 'QUALITY ASSURANCE'
+	GroupName IN ('manufacturing','QUALITY ASSURANCE')
 ORDER BY
 	p.LastName,
-	p.FirstName
+	p.FirstName	
+```
+
+```sql
+WITH CTE_DPTID_BY_GROUP AS (
+	SELECT DepartmentID, Name, GroupName
+	FROM HumanResources.Department
+	WHERE GroupName IN ('manufacturing','QUALITY ASSURANCE')
+),
+CTE_BID_BY_DPT AS (
+	SELECT cte.DepartmentID, Name, GroupName,BusinessEntityID
+	FROM HumanResources.EmployeeDepartmentHistory e
+	INNER JOIN CTE_DPTID_BY_GROUP cte
+		ON cte.DepartmentID = e.DepartmentID
+	WHERE EndDate is NULL
+)
+SELECT 
+	p.LastName,
+	p.FirstName,
+	p.BusinessEntityID,
+	cte.Name AS "Departamento",
+	cte.GroupName AS "Grupo Departamental"
+FROM 
+	Person.Person p
+INNER JOIN CTE_BID_BY_DPT cte
+	ON cte.BusinessEntityID = p.BusinessEntityID 
+ORDER BY
+	p.LastName,
+	p.FirstName	
 ```
 
 35.- Indicar el listado de los empleados del sexo masculino y que son solteros. Tablas Emloyee y Person
@@ -751,32 +757,32 @@ ORDER BY
 
 39.- El producto más vendido. Tabla Sales.SalesOrderDetail y Production.Product. Campos ProductID, Name, ProductSubcategoryID, OrderQty
 
-
 ```sql
-WITH cte_accumulative_sales AS (
-SELECT
-	ProductID,
-	SUM(OrderQty) AS unidades_vendidas
-FROM
-	Sales.SalesOrderDetail
-GROUP BY
-	ProductID
+WITH CTE_SALES_BY_PROD AS (
+	SELECT 
+		SUM(OrderQty) AS "Unidades vendidas",
+		ProductID,
+		RANK() OVER(ORDER BY SUM(OrderQty) DESC) AS "ranking"
+	FROM Sales.SalesOrderDetail 
+	GROUP BY ProductID
+),
+CTE_MAX_SALES_PROD AS (
+	SELECT 
+		"Unidades vendidas",
+		ProductID		
+	FROM CTE_SALES_BY_PROD
+	WHERE "ranking" = 1
 )
-
 SELECT	
 	p.ProductID,
 	p.Name,
 	p.ProductSubcategoryID,
-	cte_as.unidades_vendidas
+	"Unidades vendidas"	
 FROM
-	cte_accumulative_sales cte_as
-INNER JOIN
 	Production.Product p
-	ON p.ProductID = cte_as.ProductID
-WHERE
-	cte_as.unidades_vendidas >= ALL (SELECT unidades_vendidas
-								FROM cte_accumulative_sales)
-;
+INNER JOIN
+	CTE_MAX_SALES_PROD cte
+	ON cte.ProductID = p.ProductID
 ```
 
 ```sql
@@ -929,7 +935,7 @@ ORDER BY
 	s.ProductID;
 ```
 
-41.- Listado de productos por número de ventas ordenado de mayor a menor. Tablas Sales.SalesOrderDetail y Production.Product. Campos ProductID, Name y OrderQty.
+41.- Listado de productos por número de ventas ordenado de mayor a menor. Tablas Sales.SalesOrderDetail y Production.Product. Campos ProductID, Name, ProductSubcategoryID y OrderQty.
 
 ```sql
 SELECT
@@ -951,14 +957,14 @@ ORDER BY
 	p.Name
 ```
 
-42.- Las ventas por territorio. Tablas SalesOrderHeader y SalesTerritory. Campos TerritoryID, Name, SubTotal, TotalDue.
+42.- Las ventas por territorio. Tablas Sales.SalesOrderHeader y Sales.SalesTerritory. Campos TerritoryID, Name, SubTotal y TotalDue.
 
 ```sql
 SELECT
-	SUM(SubTotal) AS "Total sin IVA ni portes",
-	SUM(TotalDue) AS "Total",
 	s.TerritoryID,
-	t.Name
+	t.Name,
+	SUM(SubTotal) AS "Total sin IVA ni portes",
+	SUM(TotalDue) AS "Total"
 FROM
 	Sales.SalesOrderHeader s
 INNER JOIN
